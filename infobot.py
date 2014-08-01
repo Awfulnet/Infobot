@@ -22,7 +22,7 @@ VERSION = "0.1-DEV"
 class Infobot(IRCHandler):
     """ Infobot main class """
     def __init__(self, config):
-        super().__init__(config, verbose=False)
+        super().__init__(config, verbose=True)
 
         self.config = config
         self.nick = config["nick"]

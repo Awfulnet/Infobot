@@ -83,16 +83,12 @@ def append_notice_listener(bot, msg, message, sender):
 def addinfo(bot, pmsg):
     nick, chan, msg = process_privmsg(pmsg)
     
-    m = re.search(r"^&(add|set) .+", msg)
+    m = re.search(r"^!add .+", msg)
     if not m:
         return
 
-    if m.groups()[0] == 'add':
-        bot.notice(nick, "\x0304Warning\x0304\x0314: \x02!add\x02\x0314 is deprecated and may be removed in future versions; "
-            "you are advised to use \x02!set\x02\x0314 instead.")
-
     if ' ' not in msg:
-        return bot.msg(chan, "Usage: !set <info>")
+        return bot.msg(chan, "Usage: !add <info>")
     user, host = pmsg['host'].split("@")
     user = user.split("!")[0]
 
@@ -113,7 +109,7 @@ def init(bot):
     db = Database(password=bot.config["dbpass"])
     bot.data["db"] = db
 
-@command('info', '^(&|@)$name')
+@command('info', '^(!|@)$name(\s|$)')
 def getinfo(bot, nick, chan, gr, arg):
     """ !info <nick> -> get the info for a given user. """
     if not arg:
@@ -131,7 +127,7 @@ def getinfo(bot, nick, chan, gr, arg):
         return msgfn("%s: %s" % info)
     msgfn("%s →  %s: %s" % (arg, info[0], info[1]))
 
-@command('del|rm', '^&($name)')
+@command('del|rm', r'^!($name)(\s|$)')
 def rmalias(bot, nick, chan, _, arg):
     """ !del <type> -> delete 'alias' or 'info' """
     if not arg or arg not in ('alias', 'info'):
@@ -142,7 +138,7 @@ def rmalias(bot, nick, chan, _, arg):
         insert_callback(bot, "NOTICE", rminfo_notice_listener)
     bot._msg("NickServ", "ACC %s" % (nick))
 
-@command('append', '^&$name', ppmsg=True)
+@command('append', r'^!$name(\s|$)', ppmsg=True)
 def appendinfo(bot, nick, chan, arg, pmsg):
     """ !append <info> -> Append <info> to your info. """
     if not arg:
