@@ -124,7 +124,7 @@ def getinfo(bot, nick, chan, gr, arg):
         return msgfn("No info found for {0}. Use '!add <info>' to add your info.".format(arg))
 
     if info[0].lower() == arg.lower():
-        return msgfn("%s: %s" % info)
+        return msgfn("%s: %s" % (arg, info[1]))
     msgfn("%s →  %s: %s" % (arg, info[0], info[1]))
 
 @command('del|rm', r'^!($name)(\s|$)')
