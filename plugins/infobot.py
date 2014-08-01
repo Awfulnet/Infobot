@@ -123,7 +123,7 @@ def getinfo(bot, nick, chan, gr, arg):
     if not info:
         return msgfn("No info found for {0}. Use '!add <info>' to add your info.".format(arg))
 
-    if info[0] == arg:
+    if info[0].lower() == arg:
         return msgfn("%s: %s" % info)
     msgfn("%s →  %s: %s" % (arg, info[0], info[1]))
 
