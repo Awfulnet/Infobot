@@ -23,7 +23,7 @@ class Infobot(IRCHandler):
     """ Infobot main class """
     def __init__(self, config):
         print("Infobot version %s" % (VERSION))
-        super().__init__(config, verbose=True)
+        super().__init__(config, verbose=False)
 
         self.config = config
         self.nick = config["nick"]
