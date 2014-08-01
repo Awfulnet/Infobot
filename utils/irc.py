@@ -20,6 +20,7 @@ class IRCHandler(object):
     def __init__(self, bconfig, verbose=False):
         globals()["CONFIG"] = bconfig
         self.sock = socket.socket()
+        self.sock_file = None
         self.verbose = verbose
         self.running = True
         self.buff = Buffer()
@@ -45,10 +46,11 @@ class IRCHandler(object):
             while self.running:
                 if loops != 0:
                     try:
-                        self.buff.append(self.sock.recv(4096).decode("utf-8"))
+                        self.buff.append(self.sock_file.readline())
                     except UnicodeDecodeError:
                         traceback.print_exc()
                 else:
+                    self.sock_file = self.sock.makefile()
                     self.sendnick()
                     self.senduser()
 
@@ -80,10 +82,15 @@ class IRCHandler(object):
     def run_callback(self, cname, *args):
         noncore = False
         funcs = self.__irccallbacks__.get(cname, None)
+        __core__ = None
         if not funcs:
             return
         for func in funcs:
-            if getattr(func, "__core__"):
+            if not hasattr(func, "__core__"):
+                __core__ = False
+            else:
+                __core__ = getattr(func, "__core__")
+            if __core__:
                 if type(func) == types.MethodType:
                     func(*args)
                 else:

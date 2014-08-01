@@ -8,6 +8,11 @@ from queue import Queue
 import traceback
 import sys
 
+def get_core(item):
+    if not hasattr(item, "__core__"):
+        return False
+    return item.__core__
+
 class HandlerThread(Thread):
     def __init__(self, bot, lock):
         self.bot = bot
@@ -21,7 +26,7 @@ class HandlerThread(Thread):
                 args = self.queue.get()
                 with self.lock:
                     for item in self.bot.__irccallbacks__[args[0]]:
-                        if not item.__core__:
+                        if not get_core(item):
                             if self.bot.verbose:
                                 print("[command thread:%s] calling fn %s" % (datetime.datetime.utcnow(), item.__name__))
                             item(self.bot, *(args[1]))

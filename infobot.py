@@ -47,10 +47,20 @@ class Infobot(IRCHandler):
     def __repr__(self):
         return "Infobot(server=%r)" % (self.config["server"].split(':')[0])
 
+    def register_callback(self, ctype, func):
+        if ctype in self.__irccallbacks__:
+            self.__irccallbacks__[ctype].append(func)
+        else:
+            self.__irccallbacks__[ctype] = [func]
+
     def _msg(self, chan, msg):
         self.sock.send(b"PRIVMSG ")
-        self.sock.send(chan.encode('utf-8'))
-        self.sock.send(b" :"+msg.encode('utf-8'))
+        self.sock.send(("%s :%s" % (chan, msg)).encode('utf-8'))
+        self.sock.send(b"\r\n")
+
+    def notice(self, chan, msg):
+        self.sock.send(b"NOTICE ")
+        self.sock.send(("%s :%s" % (chan, msg)).encode('utf-8'))
         self.sock.send(b"\r\n")
 
     def msg(self, chan, msg):

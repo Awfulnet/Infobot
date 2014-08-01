@@ -29,23 +29,28 @@ colors = {
 class Styler(object):
     """ A styler """
 
+    @staticmethod
     def sopa(self, string):
         return (re.sub(r"\S+", lambda m: "\x16%s\x0F" % (" "*len(m.group(0))), string) + " #fightsopa")
 
-    def bold(self, string):
+    @staticmethod
+    def bold(string):
         return "\x02%s\x02" % (string)
 
-    def underline(self, string):
+    @staticmethod
+    def underline(string):
         return "\x1F%s\x1F" % (string)
 
-
-    def overline(self, text):
+    @staticmethod
+    def overline(text):
         return ''.join(["\u0305" + x for x in text])
 
-    def strikethrough(self, text):
+    @staticmethod
+    def strikethrough(text):
         return ''.join(["\u0336" + x for x in text])
 
-    def color(self, text, color="red", background=None):
+    @staticmethod
+    def color(text, color="red", background=None):
         if background:
             return "\x03%s,%s%s\x03" % (colors[color], colors[background], text)
         return "\x03%s%s\x03" % (colors[color], text)

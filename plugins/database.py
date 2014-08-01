@@ -21,9 +21,14 @@ class Database(object):
         return self.cursor.fetchone()
 
     def execute(self, string, *args, commit=True):
-        self.cursor.execute(string, *args)
-        if commit:
-            self.conn.commit()
+        try:
+            self.cursor.execute(string, *args)
+        except:
+            self.conn.rollback()
+        else:
+            if commit:
+                self.conn.commit()
+        return self
 
     def commit(self):
         self.conn.commit()

@@ -36,7 +36,7 @@ def process_privmsg(msg):
     msg = msg["arg"].split(":", 1)[1]
     return (nick, chan, msg)
 
-def command(name, regex, admin=False):
+def command(name, regex, admin=False, ppmsg=False):
     regex = regex.replace('$name', name)
     def decorator(funct):
         @wraps(funct)
@@ -54,9 +54,15 @@ def command(name, regex, admin=False):
                 return
 
             if m.groups():
-                funct(bot, nick, chan, m.groups(), arg)
+                if ppmsg:
+                    funct(bot, nick, chan, m.groups(), arg, pmsg)
+                else:
+                    funct(bot, nick, chan, m.groups(), arg)
             else:
-                funct(bot, nick, chan, arg)
+                if ppmsg:
+                    funct(bot, nick, chan, arg, pmsg)
+                else:
+                    funct(bot, nick, chan, arg)
         new_func.__core__ = False
         callback("PRIVMSG")(new_func)
         return new_func

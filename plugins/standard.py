@@ -66,7 +66,8 @@ def init(bot):
 
 @command('say', r'^&$name .+')
 def cmd_say(bot, nick, chan, arg):
-    print(datetime.datetime.utcnow())
+    if bot.verbose:
+        print(datetime.datetime.utcnow())
     bot._msg(chan, arg)
 
 cmd_say.__core__ = True #haxx
@@ -91,7 +92,7 @@ def cmd_quit(bot, nick, chan, groups, arg):
         bot._send("QUIT :bye")
     bot.gracefully_terminate()
 
-@command('eval', r'^>> ')
+@command('eval', r'^>> ', admin=True)
 def cmd_eval(bot, nick, chan, arg):
     """ eval *args -> Evaluate *args as python code."""
     arg = sugar(arg)
