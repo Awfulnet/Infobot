@@ -17,11 +17,12 @@ import time
 import plugins
 from plugins.auth import User
 
-VERSION = "0.1-DEV"
+VERSION = "1.0.0"
 
 class Infobot(IRCHandler):
     """ Infobot main class """
     def __init__(self, config):
+        print("Infobot version %s" % (VERSION))
         super().__init__(config, verbose=True)
 
         self.config = config
