@@ -45,10 +45,10 @@ class IRCHandler(object):
         try:
             while self.running:
                 if loops != 0:
-                    try:
-                        self.buff.append(self.sock_file.readline().decode('utf-8', errors='ignore'))
-                    except UnicodeDecodeError:
-                        traceback.print_exc()
+                    data = self.sock_file.readline().decode('utf-8', errors='ignore')
+                    if data == '':
+                        self.running = False
+                    self.buff.append(data)
                 else:
                     self.sock_file = self.sock.makefile('rb')
                     self.sendnick()
