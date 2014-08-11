@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from utils.irc import IRCHandler
 from utils.threads import HandlerThread
 from utils.events import Event

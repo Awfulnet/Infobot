@@ -76,7 +76,7 @@ def append_notice_listener(bot, msg, message, sender):
     user, host, info = pending_appends[nick]
     curinfo += (" " + info)
     db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, curinfo))
-    bot.notice(nick, "Info set to '%s'" % (info))
+    bot.notice(nick, "Info set to '%s'" % (curinfo))
     del pending_appends[nick]
     restore_callbacks(bot, "NOTICE")
 
@@ -138,7 +138,7 @@ def rmalias(bot, nick, chan, _, arg):
         insert_callback(bot, "NOTICE", rminfo_notice_listener)
     bot._msg("NickServ", "ACC %s" % (nick))
 
-@command('append', r'^!$name(\s|$)', ppmsg=True)
+@command('append', r'^!$name(?:\s|$)', ppmsg=True)
 def appendinfo(bot, nick, chan, arg, pmsg):
     """ !append <info> -> Append <info> to your info. """
     if not arg:
