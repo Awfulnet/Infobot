@@ -1,8 +1,8 @@
 Infobot
 =======
 
-Infobot stores info about users on [Awfulnet](http://awfulnet.org/). This open-source version is based on [James](svkampen/James) and is designed to replace old infobot. 
-hile being backward compatible it has many new features and upgrades including, but not limited to:
+Infobot stores info about users on [Awfulnet](http://awfulnet.org/). This open-source version is based on [James](https://github.com/svkampen/James) and is designed to replace old infobot. 
+While being backward compatible it has many new features and upgrades including, but not limited to:
 
 * **Unicode support** - Allows to use all thinkable characters, such as emoji or chinese, in users' infos.
 * **No length limit** - Infobot's database sets no limit on the length of infos. The only limitation is IRC's message length.
