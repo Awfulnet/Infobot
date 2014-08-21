@@ -1,13 +1,12 @@
 import psycopg2
 import sys
 
-DEFAULT_HOST = 'octopus.awfulnet.org'
 DEFAULT_USER = 'infobot'
 DEFAULT_DBNAME = 'infobot'
 
 class Database(object):
     def __init__(self, **kwargs):
-        for i in ['host', 'user', 'dbname']:
+        for i in ['user', 'dbname']:
             if i not in kwargs.keys():
                 kwargs[i] = getattr(sys.modules[__name__], "DEFAULT_" + i.upper())
 

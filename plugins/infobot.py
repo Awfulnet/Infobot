@@ -102,7 +102,7 @@ __callbacks__ = {"PRIVMSG": [addinfo], "NOTICE": [notice_listener]}
 @init
 def init(bot):
     global db
-    db = Database(password=bot.config["dbpass"])
+    db = Database(password=bot.config["dbpass"], host=bot.config["dbhost"])
     bot.data["db"] = db
 
 
