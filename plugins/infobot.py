@@ -46,6 +46,7 @@ def notice_listener(bot, msg):
             pending_rminfo.remove(nick)
         except ValueError:
             pass
+        bot.notice(nick, "You are not registered with nickserv or not properly identified.")
 
     nick = message.split()[0]
     if nick in pending_adds:
