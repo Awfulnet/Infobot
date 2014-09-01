@@ -44,7 +44,7 @@ class Infobot(IRCHandler):
         self.register_callbacks()
         self.register_plugins(plugins.get_plugins())
 
-        self.auth.addadmin(User("svkampen", "svkampen", "tehsvk.net"))
+        self.auth.addadmin(User("svkampen", "svkampen", "38485360.F44253B8.A42ECE66.IP"))
 
     def __repr__(self):
         return "Infobot(server=%r)" % (self.config["server"].split(':')[0])
