@@ -1,5 +1,6 @@
 from .util.decorators import command, init, process_privmsg
 from .database import Database
+from .sed import Substitution
 from functools import wraps
 from .util.data import get_doc
 from functools import partial
@@ -152,3 +153,25 @@ def appendinfo(bot, nick, chan, arg, pmsg):
 def execsql(bot, nick, chan, arg):
     db.execute(arg)
     bot._msg(chan, "%s" % (db.fetchall()))
+
+@command('sed', '^!$name .+', ppmsg=True)
+def sedinfo(bot, nick, chan, arg, pmsg):
+    # first, get the info for the current nick
+    info = db.execute("SELECT nick, info FROM info(%s);", (nick,)).fetchone()
+
+    user, host = pmsg['host'].split("@")
+    user = user.split("!")[0]
+
+    try:
+        sub = Substitution(arg)
+    except TypeError as e:
+        return bot.notice(nick, "Error: %s" % (e))
+
+    newinfo = sub.do(info[1])
+
+    if info[0] != nick:
+        bot.notice(nick, "Note: because your current nick is an alias, your alias will"
+                "be removed and your info will be set to %r." % (newinfo))
+
+    pending_adds[nick] = (user, host, newinfo)
+    bot._msg("NickServ", "ACC %s" % (nick))

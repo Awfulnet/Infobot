@@ -51,7 +51,8 @@ class Substitution(object):
     """ A class representing a substitution in sed. """
     def __init__(self, pattern):
         self.pattern = pattern
-        self.target, self.qual, self.re, self.sub, self.flags, self.count = self.parse(pattern)
+        self.qual, self.re, self.sub, self.flags, self.count = self.parse(pattern)
+        print("s/%s/%s/%s" % (self.re, self.sub, self.flags))
 
     def __repr__(self):
         return "Substitution(%r)" % (self.pattern)
@@ -63,15 +64,15 @@ class Substitution(object):
         count = 1
 
         groups = m.groups()
-        if 'g' in groups[4]:
+        if 'g' in groups[3]:
             count = 0
 
         flags = 0
-        for c in groups[4]: # for character in flags
+        for c in groups[3]: # for character in flags
             if c != 'g':
                 flags += getattr(re, c.upper())
 
-        sub = groups[3].replace("\\/", "/")
+        sub = groups[2].replace("\\/", "/")
         sub = re.sub(r"(?<!\\)(\\)(?=\d+|g<\w+>)", r"\\\\", sub)
         sub = codecs.escape_decode(bytes(sub, "utf-8"))[0].decode('utf-8')
 
