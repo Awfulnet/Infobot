@@ -1,5 +1,6 @@
 import psycopg2
 import sys
+import traceback
 
 DEFAULT_USER = 'infobot'
 DEFAULT_DBNAME = 'infobot'
@@ -12,6 +13,7 @@ class Database(object):
 
         self.conn = psycopg2.connect(keepalives_idle=60, **kwargs)
         self.cursor = self.conn.cursor()
+        self.rowcount = 0
 
     def fetchall(self):
         return self.cursor.fetchall()
@@ -22,9 +24,15 @@ class Database(object):
     def execute(self, string, *args, commit=True):
         try:
             self.cursor.execute(string, *args)
+        except psycopg2.IntegrityError:
+            self.rowcount = 0
+            self.conn.rollback()
         except:
+            traceback.print_exc()
+            self.rowcount = self.cursor.rowcount
             self.conn.rollback()
         else:
+            self.rowcount = self.cursor.rowcount
             if commit:
                 self.conn.commit()
         return self
