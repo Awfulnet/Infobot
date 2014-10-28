@@ -61,7 +61,7 @@ def is_cmdchar_used(bot, nick, chan, gr, arg):
     else:
         msg_fn("%s is used by %s" % (arg, ', '.join([i[0] for i in info])))
 
-@command('cmdchar.add', '^(!|@)$name')
+@command('cmdchar.add', '^(!|@)$name\s')
 def add_cmdchar(bot, nick, chan, gr, arg):
     """ {!@}cmdchar.add <cmdchar> <bot> -> add a bots entry """
     if not arg:
@@ -69,6 +69,15 @@ def add_cmdchar(bot, nick, chan, gr, arg):
 
     msg_fn = partial(bot.notice, nick) if (gr[0] == '!') else partial(bot.msg, chan)
     args = arg.split()
+
+    bo = bot.data["db"].execute("SELECT owner FROM bots WHERE lower(bot) = lower(%s) LIMIT 1", args[1]).fetchone()
+    if bo:
+        if bo[0] != nick:
+            return msg_fn("You don't own the bot %s!" % (args[1]))
+
+    if not bot.auth.is_authed(nick):
+        return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
+    
 
     already_exists = bot.data["db"].execute("SELECT bot FROM bots WHERE cmdchar = %s", args[0]).fetchall()
 
