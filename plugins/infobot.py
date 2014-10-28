@@ -7,6 +7,7 @@ from functools import partial
 import re
 import traceback
 import inspect
+from functools import reduce
 import gc
 
 db = None
@@ -110,7 +111,10 @@ def appendinfo(bot, nick, chan, arg, pmsg):
 @command('sql', '^&$name .+', admin=True)
 def execsql(bot, nick, chan, arg):
     db.execute(arg)
-    bot._msg(chan, "%s" % (db.fetchall()))
+    try:
+        bot._msg(chan, "%s" % (reduce(lambda x, y: list(x) + list(y), db.fetchall())))
+    except:
+       traceback.print_exc() 
 
 @command('sed', '^!$name .+', ppmsg=True)
 def sedinfo(bot, nick, chan, arg, pmsg):
