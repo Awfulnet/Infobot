@@ -23,13 +23,16 @@ class HandlerThread(Thread):
     def run(self):
         while True:
             try:
+                items = None
                 args = self.queue.get()
                 with self.lock:
-                    for item in self.bot.__irccallbacks__[args[0]]:
-                        if not get_core(item):
-                            if self.bot.verbose:
-                                print("[command thread:%s] calling fn %s" % (datetime.datetime.utcnow(), item.__name__))
-                            item(self.bot, *(args[1]))
+                    items = self.bot.__irccallbacks__[args[0]]
+                
+                for item in items:
+                    if not get_core(item):
+                        if self.bot.verbose:
+                            print("[command thread:%s] calling fn %s" % (datetime.datetime.utcnow(), item.__name__))
+                        item(self.bot, *(args[1]))
 
             except BaseException as e:
                 if not isinstance(e, SystemExit) and not isinstance(e, KeyboardInterrupt):

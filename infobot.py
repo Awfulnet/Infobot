@@ -110,6 +110,12 @@ class Infobot(IRCHandler):
         self.events.MessageEvent.fire(self, nick, chan, msg)
         print("[main thread:%s] [%s] <%s> %s" % (now(), chan, nick, msg))
 
+    @IRCCallback("NOTICE")
+    def notice_listener(self, msg):
+        sys.__stdout__.write("[main thread:%s] *%s* %s\n" % (now(), msg["host"], msg["arg"].split(" ", 1)[1][1:]))
+        sys.__stdout__.flush()
+
+
     def register_plugins(self, plugins):
         for plugin in plugins:
             print("[main thread:%s] processing plugin %s" % (now(), plugin.__file__))

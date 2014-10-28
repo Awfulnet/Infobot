@@ -11,75 +11,11 @@ import gc
 
 db = None
 
-pending_adds = {}
-pending_alias_adds = {}
-pending_appends = {}
-pending_rmalias = []
-pending_rminfo = []
-
 def caller():
     code_obj = inspect.stack()[1][0].f_code
     referrers = [x for x in gc.get_referrers(code_obj) if inspect.isfunction(x)]
     return referrers[0]
 
-def insert_callback(bot, ctype, func):
-    try:
-        bot.__irccallbacks__[ctype].append(func)
-    except KeyError:
-        bot.__irccallbacks__[ctype] = [func]
-
-def notice_listener(bot, msg):
-    message = msg["arg"].split(" ", 1)[1][1:]
-    sender = msg["host"].split("!")[0]
-
-    if sender.lower() != "nickserv" or "ACC" not in message:
-        return
-    if "ACC" in message and not message.endswith("3"):
-        nick = message.split()[0]
-        pending_adds.pop(nick, None)
-        pending_alias_adds.pop(nick, None)
-        pending_appends.pop(nick, None)
-        try:
-            pending_rmalias.remove(nick)
-        except ValueError:
-            pass
-        try:
-            pending_rminfo.remove(nick)
-        except ValueError:
-            pass
-        bot.notice(nick, "You are not registered with nickserv or not properly identified.")
-
-    nick = message.split()[0]
-    if nick in pending_adds:
-        user, host, info = pending_adds[nick]
-        db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, info))
-        del pending_adds[nick]
-        bot.notice(nick, "Info set to '%s'" % (info))
-    if nick in pending_appends:
-        user, host, toappend = pending_appends[nick]
-        alias, info = db.execute("SELECT nick, info FROM info(%s)", (nick,)).fetchone()
-        info += (" " + toappend)
-        db.execute("SELECT addinfo(%s, %s, %s, %s);", (alias, user, host, info))
-        bot.notice(nick, "Info set to '%s'" % (info))
-        del pending_appends[nick]
-    if nick in pending_alias_adds:
-        alias = pending_alias_adds[nick]
-        success = db.execute("SELECT addalias(%s, %s);", (nick, alias)).fetchone()[0]
-        if not success:
-            bot.notice(nick, "Error setting alias; you are creating an"
-                " infinitely looping alias chain.")
-        else:
-            bot.notice(nick, "The info of your current nick %s now points to %s." % (nick, alias))
-        del pending_alias_adds[nick]
-    if nick in pending_rmalias:
-        pending_rmalias.remove(nick)
-        db.execute("SELECT delalias(%s);", (nick,))
-        bot.notice(nick, "Your nick now points to itself instead of to an alias.")
-    if nick in pending_rminfo:
-        pending_rminfo.remove(nick)
-        db.execute("SELECT delinfo(%s);", (nick,))
-        bot.notice(nick, "Deleted info.")
-   
 def addinfo(bot, pmsg):
     nick, chan, msg = process_privmsg(pmsg)
     
@@ -93,13 +29,25 @@ def addinfo(bot, pmsg):
     user = user.split("!")[0]
 
     info = msg.split(" ", 1)[1]
-    if 'alias' in info:
-        pending_alias_adds[nick] = msg.split()[2]
-    else:
-        pending_adds[nick] = (user, host, info)
-    bot._msg("NickServ", "ACC %s" % (nick))
+    if not bot.auth.is_authed(nick):
+        return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
 
-__callbacks__ = {"PRIVMSG": [addinfo], "NOTICE": [notice_listener]}
+    if 'alias' in info:
+        alias = msg.split()[2]
+        
+        success = db.execute("SELECT addalias(%s, %s);", (nick, alias)).fetchone()[0]
+        
+        if not success:
+            bot.notice(nick, "Error setting alias; you are creating an"
+                " infinitely looping alias chain.")
+        else:
+            bot.notice(nick, "The info of your current nick %s now points to %s." % (nick, alias))
+        
+    else:
+        db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, info))
+        bot.notice(nick, "Info set to '%s'" % (info))
+
+__callbacks__ = {"PRIVMSG": [addinfo]}
 
 @init
 def init(bot):
@@ -131,11 +79,16 @@ def rmalias(bot, nick, chan, _, arg):
     """ !del <type> -> delete 'alias' or 'info' """
     if not arg or arg not in ('alias', 'info'):
         return bot._msg(chan, get_doc())
+
+    if not bot.auth.is_authed(nick):
+        return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
+
     if arg == 'alias':
-        pending_rmalias.append(nick)
+        db.execute("SELECT delalias(%s);", (nick,))
+        bot.notice(nick, "Your nick now points to itself instead of to an alias.")
     else:
-        pending_rminfo.append(nick)
-    bot._msg("NickServ", "ACC %s" % (nick))
+        db.execute("SELECT delinfo(%s);", (nick,))
+        bot.notice(nick, "Deleted info.")
 
 @command('append', r'^!$name(?:\s|$)', ppmsg=True)
 def appendinfo(bot, nick, chan, arg, pmsg):
@@ -145,9 +98,14 @@ def appendinfo(bot, nick, chan, arg, pmsg):
     
     user, host = pmsg['host'].split("@")
     user = user.split("!")[0]
-    
-    pending_appends[nick] = (user, host, arg)
-    bot._msg("NickServ", "ACC %s" % (nick))
+
+    if not bot.auth.is_authed(nick):
+        return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
+
+    alias, info = db.execute("SELECT nick, info FROM info(%s)", (nick,)).fetchone()
+    info += (" " + arg)
+    db.execute("SELECT addinfo(%s, %s, %s, %s);", (alias, user, host, info))
+    bot.notice(nick, "Info set to '%s'" % (info))
 
 @command('sql', '^&$name .+', admin=True)
 def execsql(bot, nick, chan, arg):
@@ -162,6 +120,9 @@ def sedinfo(bot, nick, chan, arg, pmsg):
     user, host = pmsg['host'].split("@")
     user = user.split("!")[0]
 
+    if not bot.auth.is_authed(nick):
+        return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
+
     try:
         sub = Substitution(arg)
     except TypeError as e:
@@ -173,5 +134,5 @@ def sedinfo(bot, nick, chan, arg, pmsg):
         bot.notice(nick, "Note: because your current nick is an alias, your alias will"
                 "be removed and your info will be set to %r." % (newinfo))
 
-    pending_adds[nick] = (user, host, newinfo)
-    bot._msg("NickServ", "ACC %s" % (nick))
+    db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, newinfo))
+    bot.notice(nick, "Info set to '%s'" % (newinfo))

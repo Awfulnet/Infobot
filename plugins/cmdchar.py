@@ -5,7 +5,7 @@ from functools import partial
 @command('cmdchars', '^!$name$')
 def get_cmdchars(bot, nick, chan, arg):
     """ !cmdchars -> get all cmdchars currently in use """
-    info = bot.data["db"].execute("SELECT cmdchar, string_agg(bot, ' ' ORDER BY bot) \
+    info = bot.data["db"].execute("SELECT cmdchar, string_agg(bot, ', ' ORDER BY bot) \
                                    FROM bots GROUP BY cmdchar;").fetchall()
 
     for item in info:
@@ -29,13 +29,13 @@ def get_bots(bot, nick, chan, arg):
 
 
 @command('bot', '^(!|@)$name\s')
-def get_bot(bot, nick, chan, gr, arg):
+def get_bot(bot, nick, chan, gr, arg): 
     """ {!@}bot <bot name> -> get information about a bot in the db """
     if not arg:
         bot.msg(chan, get_doc())
     msg_fn = partial(bot.notice, nick) if (gr[0] == '!') else partial(bot.msg, chan)
 
-    info = bot.data["db"].execute("SELECT bot, owner, string_agg(cmdchar, ', ' ORDER BY cmdchar) \
+    info = bot.data["db"].execute("SELECT bot, owner, string_agg(cmdchar, ' ' ORDER BY cmdchar) \
                                    FROM bots WHERE bot = %s GROUP BY bot, owner;", (arg,)).fetchone();
 
     if not info:
