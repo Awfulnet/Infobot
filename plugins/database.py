@@ -22,8 +22,11 @@ class Database(object):
         return self.cursor.fetchone()
 
     def execute(self, string, *args, commit=True):
+        args = list(args)
+        if type(args[0]) != list:
+            args[0] = [args[0]]
         try:
-            self.cursor.execute(string, *args)
+            self.cursor.execute(string, *tuple(args))
         except psycopg2.IntegrityError:
             self.rowcount = 0
             self.conn.rollback()
