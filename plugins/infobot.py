@@ -112,7 +112,7 @@ def appendinfo(bot, nick, chan, arg, pmsg):
 def execsql(bot, nick, chan, arg):
     db.execute(arg)
     try:
-        bot._msg(chan, "%s" % (reduce(lambda x, y: list(x) + list(y), db.fetchall())))
+        bot._msg(chan, "%s" % ", ".join([str(list(i)) for i in db.fetchall()]))
     except:
        traceback.print_exc() 
 
