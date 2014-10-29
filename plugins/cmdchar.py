@@ -61,7 +61,7 @@ def is_cmdchar_used(bot, nick, chan, gr, arg):
     else:
         msg_fn("%s is used by %s" % (arg, ', '.join([i[0] for i in info])))
 
-@command('cmdchar.add', '^(!|@)$name\s')
+@command('cmdchar.add', '^(!|@)$name')
 def add_cmdchar(bot, nick, chan, gr, arg):
     """ {!@}cmdchar.add <cmdchar> <bot> -> add a bots entry """
     if not arg:
@@ -73,7 +73,7 @@ def add_cmdchar(bot, nick, chan, gr, arg):
     bo = bot.data["db"].execute("SELECT owner FROM bots WHERE lower(bot) = lower(%s) LIMIT 1", args[1]).fetchone()
     if bo:
         if bo[0] != nick:
-            return msg_fn("You don't own the bot %s!" % (args[1]))
+            return msg_fn("You don't own %s!" % (args[1]))
 
     if not bot.auth.is_authed(nick):
         return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
@@ -91,3 +91,27 @@ def add_cmdchar(bot, nick, chan, gr, arg):
             msg_fn("Command char %s added to %s" % (args[0], args[1]))
     else:
         msg_fn("Command char %s is already used by %s!" % (args[0], args[1]))
+
+@command('cmdchar.del', '^(!|@)$name')
+def del_cmdchar(bot, nick, chan, gr, arg):
+    """ {!@}cmdchar.del <cmdchar> <bot> -> remove a bots entry """
+    if not arg:
+        bot.msg(chan, get_doc())
+
+    msg_fn = partial(bot.notice, nick) if (gr[0] == '!') else partial(bot.msg, chan)
+    args = arg.split()
+
+    data = bot.data["db"].execute("SELECT cmdchar, owner FROM bots WHERE lower(bot) = lower(%s) AND cmdchar = %s",
+            (args[1], args[0])).fetchone()
+
+    if not data:
+        return msg_fn("Command char %s is not used by %s!" % (data[0], args[1]))
+
+    if data[1] != nick:
+        return msg_fn("You don't own %s!" % (args[1]))
+
+    bot.data["db"].execute("DELETE FROM bots WHERE lower(bot) = lower(%s) AND cmdchar = %s",
+            (args[1], args[0]))
+
+    msg_fn("Removed command char %s from %s." % (args[0], args[1]))
+
