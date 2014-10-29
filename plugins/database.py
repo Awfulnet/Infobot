@@ -23,7 +23,7 @@ class Database(object):
 
     def execute(self, string, *args, commit=True):
         
-        if args and type(args[0]) != list:
+        if args and type(args[0]) != tuple:
             args = list(args)
             args[0] = [args[0]]
         try:
