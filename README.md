@@ -7,7 +7,7 @@ While being backward compatible it has many new features and upgrades including,
 * **Unicode support** - Allows to use all thinkable characters, such as emoji or chinese, in users' infos.
 * **No length limit** - Infobot's database sets no limit on the length of infos. The only limitation is IRC's message length.
 * **Info history** - All individual info edits are kept, which opens up new possibilities like restoring old info. *(not used yet)*
-* **Easier info editing** - Let users easily do replacements in their info without needing to add their entire info again. *(not implemented yet)*
+* **Easier info editing** - Let users easily do replacements in their info without needing to add their entire info again using powerful `sed` syntax.
 * **Multi-level aliases** - Overcomes old infobot's limitation and makes it possible to have situations like this:
   <br>
   A sets alias to B and B sets alias to C. Now when checking A's info it returns C's info.
