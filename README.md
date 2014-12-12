@@ -1,7 +1,7 @@
 Infobot
 =======
 
-Infobot stores info about users on [Awfulnet](http://awfulnet.org/). This open-source version is based on [James](https://github.com/svkampen/James) and is designed to replace old infobot. 
+Infobot stores info about users on [Subluminal](http://subluminal.net/). This open-source version is based on [James](https://github.com/svkampen/James) and is designed to replace old infobot on [Awfulnet](http://awfulnet.org/). 
 While being backward compatible it has many new features and upgrades including, but not limited to:
 
 * **Unicode support** - Allows to use all thinkable characters, such as emoji or chinese, in users' infos.
