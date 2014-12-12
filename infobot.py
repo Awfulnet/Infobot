@@ -145,6 +145,6 @@ class Infobot(IRCHandler):
 
 
 if __name__ == "__main__":
-    config = json.load(open("config.json", "r"))
+    config = json.loads(open("config.json", "r").read())
     bot = Infobot(config)
     bot.connect()
