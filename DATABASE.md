@@ -26,7 +26,8 @@ Usage
 `SELECT * FROM multiinfo(ARRAY['nick', 'nick2', 'simmo']);` <br>
 *NB! When using this function, make sure you pass the array into SQL correctly using your programming language's library.*
 
-#### 
+#### Get nick's info history
+`SELECT * FROM infohistory('nick');`
 
 Tables
 ------
@@ -89,3 +90,8 @@ Returns just the info's `id` of the given `nick_` after iterating the alias chai
 `FUNCTION infoid2(nick_ character varying) RETURNS integer`
 
 Returns just the info's `id` of the given `nick_` **without** iterating the alias chain.
+
+### infohistory
+`FUNCTION infohistory(nick_ character varying) RETURNS SETOF infos`
+
+Returns the full infos table rows corresponding to `nick_`'s all historical infos.
