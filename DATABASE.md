@@ -1,20 +1,20 @@
 Database
 ========
-The aim of this file is to document the publically accessible Infobot databse of Awfulnet.
+The aim of this file is to document the publically accessible Infobot databse of Subluminal.
 
-Infobot uses a PostgreSQL database which is hosted on Awfulnet servers. Its schema is also published in this repo's `schema.sql` file but for easier usage and connecting we provide this document.
+Infobot uses a PostgreSQL database which is hosted on svkampen's server. Its schema is also published in this repo's `schema.sql` file but for easier usage and connecting we provide this document.
 
 Connecting
 ----------
 For whichever reason you wish to use the database you need a PostgreSQL tool or a suitable library in your programming language. The publically readable access details are the following:
 
-* Host: `octopus.awfulnet.org`
+* Host: `tehsvk.net`
 * Port: `5432` (default)
 * Username: `readonly`
 * Password: `readonly`
 * Database: `infobot`
 
-Some PostgreSQL libraries also take a connection string: `postgres://readonly:readonly@octopus.awfulnet.org/infobot`.
+Some PostgreSQL libraries also take a connection string: `postgres://readonly:readonly@tehsvk.net/infobot`.
 
 Usage
 -----
