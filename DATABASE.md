@@ -56,6 +56,17 @@ This table contains the current alias mappings. <br>
 * `alias` - nickname whose info the current nickname will point to
 * `ts` - timestamp when the alias was set, in UTC, `-infinity` means this row was imported from old infobot
 
+### bots
+This table stores bots' command character mappings and also their owners. <br>
+*NB! One command character may be used by multiple bots and one bot may also use multiple command characters*
+
+**Columns**:
+
+* `id` - unique entry identifier
+* `cmdchar` - bot's command character
+* `bot` - bot's nickname
+* `owner` - bot owner's nickname
+
 Functions
 ---------
 Only functions available to the read-only user are documented here as they're the only ones this user can execute.
