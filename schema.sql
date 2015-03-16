@@ -3,8 +3,8 @@
 --
 
 -- Dumped from database version 9.3.5
--- Dumped by pg_dump version 9.3.5
--- Started on 2014-12-12 21:21:46 EET
+-- Dumped by pg_dump version 9.3.6
+-- Started on 2015-03-16 18:03:37 EET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -33,7 +33,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 193 (class 1255 OID 16554)
+-- TOC entry 192 (class 1255 OID 16554)
 -- Name: addalias(character varying, character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -59,7 +59,7 @@ $$;
 ALTER FUNCTION public.addalias(nick_ character varying, alias_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 194 (class 1255 OID 16555)
+-- TOC entry 193 (class 1255 OID 16555)
 -- Name: addinfo(character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -74,7 +74,7 @@ $$;
 ALTER FUNCTION public.addinfo(nick_ character varying, user_ character varying, host_ character varying, info_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 196 (class 1255 OID 16557)
+-- TOC entry 195 (class 1255 OID 16557)
 -- Name: alias(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -88,7 +88,7 @@ $$;
 ALTER FUNCTION public.alias(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 195 (class 1255 OID 16556)
+-- TOC entry 194 (class 1255 OID 16556)
 -- Name: aliaschain(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -107,7 +107,7 @@ $$;
 ALTER FUNCTION public.aliaschain(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 202 (class 1255 OID 16601)
+-- TOC entry 201 (class 1255 OID 16601)
 -- Name: copyinfo(character varying, character varying, character varying, integer); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -122,7 +122,7 @@ $$;
 ALTER FUNCTION public.copyinfo(nick_ character varying, user_ character varying, host_ character varying, id_ integer) OWNER TO infobot;
 
 --
--- TOC entry 192 (class 1255 OID 16553)
+-- TOC entry 191 (class 1255 OID 16553)
 -- Name: delalias(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -136,7 +136,7 @@ $$;
 ALTER FUNCTION public.delalias(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 197 (class 1255 OID 16558)
+-- TOC entry 196 (class 1255 OID 16558)
 -- Name: delinfo(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -172,7 +172,7 @@ CREATE TABLE infos (
 ALTER TABLE public.infos OWNER TO infobot;
 
 --
--- TOC entry 199 (class 1255 OID 16560)
+-- TOC entry 198 (class 1255 OID 16560)
 -- Name: info(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -186,21 +186,21 @@ $$;
 ALTER FUNCTION public.info(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 191 (class 1255 OID 16600)
+-- TOC entry 202 (class 1255 OID 16600)
 -- Name: infohistory(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
 CREATE FUNCTION infohistory(nick_ character varying) RETURNS SETOF infos
     LANGUAGE sql ROWS 1
     AS $$
-SELECT * FROM infos WHERE nick = nick_;
+SELECT infos.* FROM infos, aliaschain(nick_) as ac WHERE infos.nick = ac.nick ORDER BY infos.id;
 $$;
 
 
 ALTER FUNCTION public.infohistory(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 198 (class 1255 OID 16559)
+-- TOC entry 197 (class 1255 OID 16559)
 -- Name: infoid(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -214,7 +214,7 @@ $$;
 ALTER FUNCTION public.infoid(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 200 (class 1255 OID 16561)
+-- TOC entry 199 (class 1255 OID 16561)
 -- Name: infoid2(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -241,7 +241,7 @@ CREATE FUNCTION latesttimestamp(nick character varying) RETURNS timestamp withou
 ALTER FUNCTION public.latesttimestamp(nick character varying) OWNER TO infobot;
 
 --
--- TOC entry 201 (class 1255 OID 16562)
+-- TOC entry 200 (class 1255 OID 16562)
 -- Name: multiinfo(character varying[]); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -479,7 +479,7 @@ GRANT ALL ON TABLE bots TO infobot;
 GRANT SELECT ON TABLE bots TO readonly;
 
 
--- Completed on 2014-12-12 21:22:35 EET
+-- Completed on 2015-03-16 18:04:05 EET
 
 --
 -- PostgreSQL database dump complete
