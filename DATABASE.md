@@ -1,20 +1,20 @@
 Database
 ========
-The aim of this file is to document the publically accessible Infobot databse of Awfulnet.
+The aim of this file is to document the publically accessible Infobot databse of Subluminal.
 
-Infobot uses a PostgreSQL database which is hosted on Awfulnet servers. Its schema is also published in this repo's `schema.sql` file but for easier usage and connecting we provide this document.
+Infobot uses a PostgreSQL database which is hosted on svkampen's server. Its schema is also published in this repo's `schema.sql` file but for easier usage and connecting we provide this document.
 
 Connecting
 ----------
 For whichever reason you wish to use the database you need a PostgreSQL tool or a suitable library in your programming language. The publically readable access details are the following:
 
-* Host: `octopus.awfulnet.org`
+* Host: `tehsvk.net`
 * Port: `5432` (default)
 * Username: `readonly`
 * Password: `readonly`
 * Database: `infobot`
 
-Some PostgreSQL libraries also take a connection string: `postgres://readonly:readonly@octopus.awfulnet.org/infobot`.
+Some PostgreSQL libraries also take a connection string: `postgres://readonly:readonly@tehsvk.net/infobot`.
 
 Usage
 -----
@@ -26,7 +26,8 @@ Usage
 `SELECT * FROM multiinfo(ARRAY['nick', 'nick2', 'simmo']);` <br>
 *NB! When using this function, make sure you pass the array into SQL correctly using your programming language's library.*
 
-#### 
+#### Get nick's info history
+`SELECT * FROM infohistory('nick');`
 
 Tables
 ------
@@ -54,6 +55,17 @@ This table contains the current alias mappings. <br>
 * `nick` - setter's nickname
 * `alias` - nickname whose info the current nickname will point to
 * `ts` - timestamp when the alias was set, in UTC, `-infinity` means this row was imported from old infobot
+
+### bots
+This table stores bots' command character mappings and also their owners. <br>
+*NB! One command character may be used by multiple bots and one bot may also use multiple command characters*
+
+**Columns**:
+
+* `id` - unique entry identifier
+* `cmdchar` - bot's command character
+* `bot` - bot's nickname
+* `owner` - bot owner's nickname
 
 Functions
 ---------
@@ -89,3 +101,8 @@ Returns just the info's `id` of the given `nick_` after iterating the alias chai
 `FUNCTION infoid2(nick_ character varying) RETURNS integer`
 
 Returns just the info's `id` of the given `nick_` **without** iterating the alias chain.
+
+### infohistory
+`FUNCTION infohistory(nick_ character varying) RETURNS SETOF infos`
+
+Returns the full infos table rows corresponding to `nick_`'s all historical infos.
