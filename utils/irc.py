@@ -113,8 +113,8 @@ class IRCHandler(object):
         self.__irccallbacks__ = {}
         funcs = list(dict(inspect.getmembers(self, predicate=inspect.ismethod)).values())
         for func in funcs:
-            if "return" in func.__annotations__:
-                for item in func.__annotations__["return"]:
+            if hasattr(func, "__irccallback_hooks__"):
+                for item in func.__irccallback_hooks__:
                     print("[main thread:%s] registering %s for %s" % (now(), func, item))
                     if item in self.__irccallbacks__:
                         self.__irccallbacks__[item].append(func)
