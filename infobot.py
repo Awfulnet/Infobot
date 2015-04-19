@@ -14,6 +14,7 @@ import json
 import threading
 import datetime
 import time
+import ssl
 
 import plugins
 from plugins.auth import User
@@ -90,6 +91,8 @@ class Infobot(IRCHandler):
 
     def connect(self):
         self.cmd_thread.start()
+        if self.config["ssl"]:
+            self.sock = ssl.wrap_socket(self.sock)
         super().connect()
 
     def msg(self, chan, msg):
