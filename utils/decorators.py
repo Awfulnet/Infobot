@@ -18,9 +18,6 @@ def startinfo(*args):
 def IRCCallback(*hooks):
     def decorator(funct):
         funct.__core__ = True
-        if "return" in funct.__annotations__:
-            raise Warning("IRCCallback mutilates function annotations, "
-                "but a return annotation is already defined.")
-        funct.__annotations__["return"] = hooks
+        funct.__irccallback_hooks__ = hooks
         return funct
     return decorator
