@@ -134,7 +134,7 @@ def sedinfo(bot, nick, chan, arg, pmsg):
 
     newinfo = sub.do(info[1])
 
-    if info[0] != nick:
+    if info[0].lower() != nick.lower():
         bot.notice(nick, "Note: because your current nick is an alias, your alias will"
                 "be removed and your info will be set to %r." % (newinfo))
 
