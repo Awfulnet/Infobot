@@ -27,7 +27,7 @@ def addinfo(bot, pmsg):
     if ' ' not in msg:
         return bot.msg(chan, "Usage: !add <info>")
     user, host = pmsg['host'].split("@")
-    user = user.split("!")[0]
+    user = user.split("!")[1]
 
     info = msg.split(" ", 1)[1]
     if not bot.auth.is_authed(nick):
@@ -98,7 +98,7 @@ def appendinfo(bot, nick, chan, arg, pmsg):
         return bot._msg(chan, get_doc())
     
     user, host = pmsg['host'].split("@")
-    user = user.split("!")[0]
+    user = user.split("!")[1]
 
     if not bot.auth.is_authed(nick):
         return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
@@ -122,7 +122,7 @@ def sedinfo(bot, nick, chan, arg, pmsg):
     info = db.execute("SELECT nick, info FROM info(%s);", (nick,)).fetchone()
 
     user, host = pmsg['host'].split("@")
-    user = user.split("!")[0]
+    user = user.split("!")[1]
 
     if not bot.auth.is_authed(nick):
         return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
