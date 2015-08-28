@@ -95,6 +95,7 @@ class Infobot(IRCHandler):
         if self.config["ssl"]:
             self.sock = ssl.wrap_socket(self.sock)
         super().connect()
+        self._send("NICK %s" % (bot.config["nick"]))
 
     def msg(self, chan, msg):
         """ Send a message to a channel. """
