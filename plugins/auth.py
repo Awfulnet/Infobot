@@ -15,20 +15,9 @@ def printish(stuff):
     sys.__stdout__.flush()
 
 def auth_notify_fn(bot, msg, condition=None, authed=None):
-    printish("acquiring lock")
     condition.acquire()
-    printish("done!")
-    assert type(authed) != type(None), "partial correctly used"
 
-    message = msg["arg"].split(" ", 3)[2]
-    sender = msg["host"].split("!")[0]
-
-    printish("%s %s" % (sender, message))
-
-    if (sender.lower() != "nickserv" or "ACC" not in message):
-        return
-
-    if (message.endswith("3") or message.endswith("2")):
+    if re.search(r"ACC\s[32]", msg["arg"]):
         authed.append(True)
     else:
         authed.append(False)
