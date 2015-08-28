@@ -1,0 +1,6 @@
+# editor / python files
+*.swp
+*__pycache__*
+
+# instance files (containing potential sensitive information)
+config.json
