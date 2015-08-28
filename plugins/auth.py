@@ -20,7 +20,7 @@ def auth_notify_fn(bot, msg, condition=None, authed=None):
     printish("done!")
     assert type(authed) != type(None), "partial correctly used"
 
-    message = msg["arg"].split(" ", 1)[1][1:]
+    message = msg["arg"].split(" ", 3)[2]
     sender = msg["host"].split("!")[0]
 
     printish("%s %s" % (sender, message))
