@@ -2,6 +2,7 @@
 IRC API - irc.py
 """
 
+import collections
 import sys
 from .buffer import Buffer
 from . import parse
@@ -110,16 +111,13 @@ class IRCHandler(object):
         self._send("NICK %s" % (CONFIG["nick"]))
 
     def register_callbacks(self):
-        self.__irccallbacks__ = {}
+        self.__irccallbacks__ = collections.defaultdict(list)
         funcs = list(dict(inspect.getmembers(self, predicate=inspect.ismethod)).values())
         for func in funcs:
             if hasattr(func, "__irccallback_hooks__"):
                 for item in func.__irccallback_hooks__:
                     print("[main thread:%s] registering %s for %s" % (now(), func, item))
-                    if item in self.__irccallbacks__:
-                        self.__irccallbacks__[item].append(func)
-                    else:
-                        self.__irccallbacks__[item] = [func]
+                    self.__irccallbacks__[item].append(func)
 
     def gracefully_terminate(self):
         """ Gracefully terminate the bot. """

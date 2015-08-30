@@ -52,10 +52,7 @@ class Infobot(IRCHandler):
         return "Infobot(server=%r)" % (self.config["server"].split(':')[0])
 
     def register_callback(self, ctype, func):
-        if ctype in self.__irccallbacks__:
-            self.__irccallbacks__[ctype].append(func)
-        else:
-            self.__irccallbacks__[ctype] = [func]
+        self.__irccallbacks__[ctype].append(func)
 
     def _msg(self, chan, msg):
         self.sock.send(b"PRIVMSG ")
