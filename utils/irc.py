@@ -119,6 +119,10 @@ class IRCHandler(object):
                     print("[main thread:%s] registering %s for %s" % (now(), func, item))
                     self.__irccallbacks__[item].append(func)
 
+    def register_callback(self, ctype, func):
+        self.__irccallbacks__[ctype].append(func)
+
+
     def gracefully_terminate(self):
         """ Gracefully terminate the bot. """
         self.running = False
