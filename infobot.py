@@ -5,6 +5,7 @@ from utils.events import Event
 from utils.events import Standard as StandardEvents
 from utils.sstate import DotDict
 from utils.decorators import IRCCallback
+from utils.style import Styler
 from utils import now
 
 import re
@@ -27,6 +28,7 @@ class Infobot(IRCHandler):
         print("Infobot version %s" % (VERSION))
         super().__init__(config, verbose=False)
 
+        self.style = Styler
         self.config = config
         self.nick = config["nick"]
 
