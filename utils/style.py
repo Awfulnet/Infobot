@@ -5,6 +5,7 @@ Style module
 import re
 import inspect
 import random
+import functools
 
 colors = {
     'white'  : '00',
@@ -157,3 +158,8 @@ class Styler(object):
 
     def random_slow(self, msg):
         return self.minify(self.random(msg))
+
+    def __getattribute__(self, name):
+        if name in colors:
+            return functools.partial(self.color, color=name)
+        return super().__getattribute__(name)
