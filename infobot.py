@@ -28,7 +28,7 @@ class Infobot(IRCHandler):
         print("Infobot version %s" % (VERSION))
         super().__init__(config, verbose=False)
 
-        self.style = Styler
+        self.style = Styler()
         self.config = config
         self.nick = config["nick"]
 
