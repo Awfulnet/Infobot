@@ -141,6 +141,9 @@ class Infobot(IRCHandler):
         for channel in self.config["autojoin"]:
             self._send("JOIN :%s" % (channel))
 
+    def has_api(self, key):
+        return bool(self.config["apis"].get(key, False))
+
     def gracefully_terminate(self):
         super().gracefully_terminate()
 
