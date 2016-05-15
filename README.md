@@ -14,4 +14,7 @@ While being backward compatible it has many new features and upgrades including,
 * **Public access** - As Infobot stores its data in a PostgreSql database we can allow other bots directly have read-only access to user info
 * **Open-sourced-ness** - Due to being a central bot on the network it must be kept up to date and liked by its users. 
 This allows everyone to to point out any bugs or submit changes, continuously making Infobot better.
+
+## Extra features
+* **Bots' command character management** - Keep a registry of bots, their owners and the command characters they use.
 * **Automatic link shortening** - Infobot automatically shortens links longer than 90 characters if a bit.ly API account is provided.
