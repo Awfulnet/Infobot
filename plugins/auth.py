@@ -73,13 +73,6 @@ class Authenticator(object):
             del self.admins[oldnick]
             self.admins[newnick].nick = newnick
 
-    def join(self, msg):
-        nick = msg["host"].split("!")[0].strip()
-        user = User.from_host(msg["host"])
-        channel = msg["arg"][1:].strip()
-
-        print("[main thread:%s] JOIN %s %s" % (now(), nick, channel))
-
     def is_authed(self, nick):
         authed = []
         printish("called, acquiring condition\n")
@@ -99,9 +92,7 @@ class Authenticator(object):
         bot.auth = self
         self.bot = bot
 
-setattr(Authenticator.join, "__core__", True)
 auth = Authenticator()
 
 __inits__ = [auth.init]
-__callbacks__ = {"NICK": [auth.nick],
-                 "JOIN": [auth.join]}
+__callbacks__ = {"NICK": [auth.nick]}
