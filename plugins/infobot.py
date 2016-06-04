@@ -24,7 +24,7 @@ def caller():
 
 def addinfo(bot, pmsg):
     nick, chan, msg = process_privmsg(pmsg)
-    
+
     m = re.search(r"^!add .+", msg)
     if not m:
         return
@@ -40,15 +40,15 @@ def addinfo(bot, pmsg):
 
     if 'alias' in info:
         alias = msg.split()[2]
-        
+
         success = db.execute("SELECT addalias(%s, %s);", (nick, alias)).fetchone()[0]
-        
+
         if not success:
             bot.notice(nick, "Error setting alias; you are creating an"
                 " infinitely looping alias chain.")
         else:
             bot.notice(nick, "The info of your current nick %s now points to %s." % (nick, alias))
-        
+
     else:
         db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, info))
         bot.notice(nick, "Info set to '%s'" % (info))
@@ -95,7 +95,7 @@ def appendinfo(bot, nick, chan, arg, pmsg):
     """ !append <info> -> Append <info> to your info. """
     if not arg:
         return bot._msg(chan, get_doc())
-    
+
     user, host = pmsg['host'].split("@")
     user = user.split("!")[1]
 
@@ -113,7 +113,7 @@ def execsql(bot, nick, chan, arg):
     try:
         bot._msg(chan, "%s" % ", ".join([str(list(i)) for i in db.fetchall()]))
     except:
-       traceback.print_exc() 
+       traceback.print_exc()
 
 @command('sed', '^!$name .+', ppmsg=True)
 def sedinfo(bot, nick, chan, arg, pmsg):
