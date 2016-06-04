@@ -12,7 +12,10 @@ import time
 import traceback
 import types
 import inspect
+import logging
 from . import now
+
+logger = logging.getLogger("irc")
 
 CONFIG = {}
 
@@ -56,8 +59,6 @@ class IRCHandler(object):
                     self.senduser()
 
                 for msg in self.buff:
-                    if self.verbose:
-                        print(">>> "+msg)
                     pmsg = parse.parse(msg)
                     if pmsg["method"] == "PING":
                         self._send("PONG "+pmsg["arg"])
@@ -65,7 +66,6 @@ class IRCHandler(object):
                         self.is_welcome = True
                         self.run_callback(pmsg["method"], pmsg)
                     else:
-                        #print(pmsg["method"])
                         self.run_callback(pmsg["method"], pmsg)
                 loops += 1
         except KeyboardInterrupt:
@@ -75,8 +75,6 @@ class IRCHandler(object):
         """ Send data through the socket and append CRLF. """
         self.outbuff.append(data+newline)
         for msg in self.outbuff:
-            if self.verbose:
-                print("<<< "+msg)
             self.sock.send((msg+newline).encode("utf-8"))
             time.sleep(.01)
 
@@ -116,7 +114,7 @@ class IRCHandler(object):
         for func in funcs:
             if hasattr(func, "__irccallback_hooks__"):
                 for item in func.__irccallback_hooks__:
-                    print("[main thread:%s] registering %s for %s" % (now(), func, item))
+                    logger.debug("Registering %s for %s", func, item)
                     self.__irccallbacks__[item].append(func)
 
     def register_callback(self, ctype, func):

@@ -7,24 +7,33 @@ from utils.sstate import DotDict
 from utils.decorators import IRCCallback
 from utils.style import Styler
 from utils.plugins import PluginLoader
-from utils import now
 
 import re
 import traceback
-import sys
 import json
 import threading
 import datetime
 import time
 import ssl
+import sys
+import logging
 
+VERSION = "1.1.0"
 
-VERSION = "1.0.0"
+LOGLEVEL = logging.DEBUG
+FORMAT = "[%(asctime)s] [%(levelname)7s] %(name)7s: %(message)s"
+logging.basicConfig(filename="infobot.log", level=LOGLEVEL)
+logger = logging.getLogger("infobot")
+
+import coloredlogs
 
 class Infobot(IRCHandler):
     """ Infobot main class """
     def __init__(self, config):
-        print("Infobot version %s" % (VERSION))
+        self.register_logger()
+
+        logger.info("Infobot version %s", VERSION)
+        logger.info("© 2014-2016 Sam van Kampen, Simmo Saan and contributors")
         super().__init__(config, verbose=False)
 
         self.style = Styler()
@@ -108,19 +117,32 @@ class Infobot(IRCHandler):
         msg = msg["arg"].split(":", 1)[1]
 
         self.events.MessageEvent.fire(self, nick, chan, msg)
-        print("[main thread:%s] [%s] <%s> %s" % (now(), chan, nick, msg))
+        logger.info("[%s] <%s> %s" , chan, nick, msg)
 
     @IRCCallback("NOTICE")
     def notice_listener(self, msg):
-        sys.__stdout__.write("[main thread:%s] *%s* %s\n" % (now(), msg["host"], msg["arg"].split(" ", 1)[1][1:]))
-        sys.__stdout__.flush()
+        logger.info("*%s* %s", msg["host"], msg["arg"].split(" ", 1)[1][1:])
 
+    def register_logger(self):
+        root = logging.getLogger()
+
+        sh = logging.StreamHandler()
+        sh.setLevel(LOGLEVEL)
+
+        formatter = coloredlogs.ColoredFormatter(fmt=FORMAT, field_styles={
+            "hostname": {"color": "blue"},
+            "programname": {"color": "cyan"},
+            "name": {"color": "red"},
+            "levelname": {"color": "magenta"},
+            "asctime": {"color": "cyan"}
+        })
+        sh.setFormatter(formatter)
+        root.addHandler(sh)
 
     def register_plugins(self):
         pluginLoader = PluginLoader()
         plugins = pluginLoader.load_all()
         for plugin in plugins:
-            print("[main thread:%s] processing plugin %s" % (now(), plugin.__file__))
             if hasattr(plugin, "__callbacks__"):
                 for k, v in plugin.__callbacks__.items():
                     for i in v:
@@ -131,6 +153,7 @@ class Infobot(IRCHandler):
             if hasattr(plugin, "__inits__"):
                 for init in plugin.__inits__:
                     init(self)
+        logger.info("Loaded %d plugins (%s)", len(plugins), ' ⇒ '.join(plugin.__name__.rsplit('.',1)[1] for plugin in plugins))
 
     @IRCCallback("376", "422")
     def welcome(self, msg):
