@@ -1,6 +1,11 @@
+"""
+Database access
+"""
 import psycopg2
 import sys
 import traceback
+
+from .util.decorators import init
 
 DEFAULT_USER = 'infobot'
 DEFAULT_DBNAME = 'infobot'
@@ -22,7 +27,6 @@ class Database(object):
         return self.cursor.fetchone()
 
     def execute(self, string, *args, commit=True):
-        
         if args and type(args[0]) != tuple:
             args = list(args)
             args[0] = [args[0]]
@@ -47,3 +51,6 @@ class Database(object):
     def close(self):
         self.conn.close()
 
+@init
+def init(bot):
+    bot.data["db"] = Database(password=bot.config["dbpass"], host=bot.config["dbhost"])
