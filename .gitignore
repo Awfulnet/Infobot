@@ -4,3 +4,4 @@
 
 # instance files (containing potential sensitive information)
 config.json
+infobot.log
