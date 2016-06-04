@@ -1,3 +1,8 @@
+"""
+Info functionality
+
+* depends: database
+"""
 from .util.decorators import command, init, process_privmsg
 from .database import Database
 from .sed import Substitution
