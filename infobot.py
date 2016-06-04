@@ -6,6 +6,7 @@ from utils.events import Standard as StandardEvents
 from utils.sstate import DotDict
 from utils.decorators import IRCCallback
 from utils.style import Styler
+from utils.plugins import PluginLoader
 from utils import now
 
 import re
@@ -17,7 +18,6 @@ import datetime
 import time
 import ssl
 
-import plugins
 from plugins.auth import User
 
 VERSION = "1.0.0"
@@ -45,7 +45,7 @@ class Infobot(IRCHandler):
         self.cmd_thread = HandlerThread(self, self.lock)
         self.cmd_thread.daemon = True
         self.register_callbacks()
-        self.register_plugins(plugins.get_plugins())
+        self.register_plugins()
 
         for item in self.config["admins"]:
             self.auth.addadmin(User(item[0], item[1], item[2]))
@@ -117,7 +117,9 @@ class Infobot(IRCHandler):
         sys.__stdout__.flush()
 
 
-    def register_plugins(self, plugins):
+    def register_plugins(self):
+        pluginLoader = PluginLoader()
+        plugins = pluginLoader.load_all()
         for plugin in plugins:
             print("[main thread:%s] processing plugin %s" % (now(), plugin.__file__))
             if hasattr(plugin, "__callbacks__"):
