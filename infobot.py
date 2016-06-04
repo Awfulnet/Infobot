@@ -18,7 +18,6 @@ import datetime
 import time
 import ssl
 
-from plugins.auth import User
 
 VERSION = "1.0.0"
 
@@ -48,7 +47,7 @@ class Infobot(IRCHandler):
         self.register_plugins()
 
         for item in self.config["admins"]:
-            self.auth.addadmin(User(item[0], item[1], item[2]))
+            self.auth.addadmin(item[0], item[1], item[2])
 
     def __repr__(self):
         return "Infobot(server=%r)" % (self.config["server"].split(':')[0])

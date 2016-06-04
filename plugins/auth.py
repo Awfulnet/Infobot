@@ -52,8 +52,9 @@ class Authenticator(object):
     def isadmin(self, person):
         return True if person.nick in self.admins and self.admins[person.nick].host == person.host else False
 
-    def addadmin(self, person):
-        self.admins[person.nick] = person
+    def addadmin(self, *person):
+        as_user = User(*person)
+        self.admins[as_user.nick] = as_user
 
     def rmadmin(self, person):
         del self.admins[person.nick]
