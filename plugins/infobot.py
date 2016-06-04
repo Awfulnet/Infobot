@@ -50,12 +50,6 @@ def addinfo(bot, pmsg):
 
 __callbacks__ = {"PRIVMSG": [addinfo]}
 
-@init
-def init(bot):
-    global db
-    db = Database(password=bot.config["dbpass"], host=bot.config["dbhost"])
-    bot.data["db"] = db
-
 
 @command('info', '^(!|@)$name(\s|$)')
 def getinfo(bot, nick, chan, gr, arg):
@@ -140,3 +134,8 @@ def sedinfo(bot, nick, chan, arg, pmsg):
 
     db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, newinfo))
     bot.notice(nick, "Info set to '%s'" % (newinfo))
+
+@init
+def init(bot):
+    global db
+    db = bot.data["db"]
