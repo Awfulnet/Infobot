@@ -13,7 +13,7 @@ print("mkconf.py, version 1.0")
 
 c["server"] = input("Server (host:port|password): ")
 c["nick"] = input("Nickname (default: Infobot): ") or 'Infobot'
-c["realname"] = input("Real name (default: Subluminal/Infobot): ") or "Subluminal/Infobot"
+c["real"] = input("Real name (default: Subluminal/Infobot): ") or "Subluminal/Infobot"
 admins = input("Admins (nick!user@host, comma separated): ").split(',')
 c["admins"] = [[x[0], x[1], x[2]] for x in [re.split("!|@", i) for i in admins]]
 
