@@ -2,9 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.3.5
--- Dumped by pg_dump version 9.3.6
--- Started on 2015-03-16 18:03:37 EET
+-- Dumped from database version 9.4.6
+-- Dumped by pg_dump version 9.5.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,9 +11,9 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
--- TOC entry 177 (class 3079 OID 11793)
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -22,8 +21,6 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2025 (class 0 OID 0)
--- Dependencies: 177
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -33,7 +30,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 192 (class 1255 OID 16554)
 -- Name: addalias(character varying, character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -59,7 +55,6 @@ $$;
 ALTER FUNCTION public.addalias(nick_ character varying, alias_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 193 (class 1255 OID 16555)
 -- Name: addinfo(character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -74,7 +69,6 @@ $$;
 ALTER FUNCTION public.addinfo(nick_ character varying, user_ character varying, host_ character varying, info_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 195 (class 1255 OID 16557)
 -- Name: alias(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -88,7 +82,6 @@ $$;
 ALTER FUNCTION public.alias(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 194 (class 1255 OID 16556)
 -- Name: aliaschain(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -107,7 +100,6 @@ $$;
 ALTER FUNCTION public.aliaschain(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 201 (class 1255 OID 16601)
 -- Name: copyinfo(character varying, character varying, character varying, integer); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -122,7 +114,6 @@ $$;
 ALTER FUNCTION public.copyinfo(nick_ character varying, user_ character varying, host_ character varying, id_ integer) OWNER TO infobot;
 
 --
--- TOC entry 191 (class 1255 OID 16553)
 -- Name: delalias(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -136,7 +127,6 @@ $$;
 ALTER FUNCTION public.delalias(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 196 (class 1255 OID 16558)
 -- Name: delinfo(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -155,8 +145,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 172 (class 1259 OID 16405)
--- Name: infos; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
+-- Name: infos; Type: TABLE; Schema: public; Owner: infobot
 --
 
 CREATE TABLE infos (
@@ -169,10 +158,9 @@ CREATE TABLE infos (
 );
 
 
-ALTER TABLE public.infos OWNER TO infobot;
+ALTER TABLE infos OWNER TO infobot;
 
 --
--- TOC entry 198 (class 1255 OID 16560)
 -- Name: info(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -186,7 +174,6 @@ $$;
 ALTER FUNCTION public.info(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 202 (class 1255 OID 16600)
 -- Name: infohistory(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -200,7 +187,6 @@ $$;
 ALTER FUNCTION public.infohistory(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 197 (class 1255 OID 16559)
 -- Name: infoid(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -214,7 +200,6 @@ $$;
 ALTER FUNCTION public.infoid(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 199 (class 1255 OID 16561)
 -- Name: infoid2(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -228,7 +213,6 @@ $$;
 ALTER FUNCTION public.infoid2(nick_ character varying) OWNER TO infobot;
 
 --
--- TOC entry 190 (class 1255 OID 16516)
 -- Name: latesttimestamp(character varying); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -241,7 +225,6 @@ CREATE FUNCTION latesttimestamp(nick character varying) RETURNS timestamp withou
 ALTER FUNCTION public.latesttimestamp(nick character varying) OWNER TO infobot;
 
 --
--- TOC entry 200 (class 1255 OID 16562)
 -- Name: multiinfo(character varying[]); Type: FUNCTION; Schema: public; Owner: infobot
 --
 
@@ -256,8 +239,7 @@ $$;
 ALTER FUNCTION public.multiinfo(nicks_ character varying[]) OWNER TO infobot;
 
 --
--- TOC entry 170 (class 1259 OID 16398)
--- Name: aliases; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
+-- Name: aliases; Type: TABLE; Schema: public; Owner: infobot
 --
 
 CREATE TABLE aliases (
@@ -267,10 +249,9 @@ CREATE TABLE aliases (
 );
 
 
-ALTER TABLE public.aliases OWNER TO infobot;
+ALTER TABLE aliases OWNER TO infobot;
 
 --
--- TOC entry 174 (class 1259 OID 16563)
 -- Name: aliasinfos; Type: VIEW; Schema: public; Owner: infobot
 --
 
@@ -295,11 +276,10 @@ CREATE VIEW aliasinfos AS
   WHERE (infos.id = ( SELECT infoid2(a.alias) AS infoid2));
 
 
-ALTER TABLE public.aliasinfos OWNER TO infobot;
+ALTER TABLE aliasinfos OWNER TO infobot;
 
 --
--- TOC entry 176 (class 1259 OID 16585)
--- Name: bots; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
+-- Name: bots; Type: TABLE; Schema: public; Owner: infobot
 --
 
 CREATE TABLE bots (
@@ -310,10 +290,9 @@ CREATE TABLE bots (
 );
 
 
-ALTER TABLE public.bots OWNER TO infobot;
+ALTER TABLE bots OWNER TO infobot;
 
 --
--- TOC entry 175 (class 1259 OID 16583)
 -- Name: bots_id_seq; Type: SEQUENCE; Schema: public; Owner: infobot
 --
 
@@ -325,11 +304,9 @@ CREATE SEQUENCE bots_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.bots_id_seq OWNER TO infobot;
+ALTER TABLE bots_id_seq OWNER TO infobot;
 
 --
--- TOC entry 2029 (class 0 OID 0)
--- Dependencies: 175
 -- Name: bots_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: infobot
 --
 
@@ -337,7 +314,6 @@ ALTER SEQUENCE bots_id_seq OWNED BY bots.id;
 
 
 --
--- TOC entry 171 (class 1259 OID 16403)
 -- Name: infos_id_seq; Type: SEQUENCE; Schema: public; Owner: infobot
 --
 
@@ -349,11 +325,9 @@ CREATE SEQUENCE infos_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.infos_id_seq OWNER TO infobot;
+ALTER TABLE infos_id_seq OWNER TO infobot;
 
 --
--- TOC entry 2030 (class 0 OID 0)
--- Dependencies: 171
 -- Name: infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: infobot
 --
 
@@ -361,7 +335,6 @@ ALTER SEQUENCE infos_id_seq OWNED BY infos.id;
 
 
 --
--- TOC entry 173 (class 1259 OID 16517)
 -- Name: latestinfos; Type: VIEW; Schema: public; Owner: infobot
 --
 
@@ -376,10 +349,46 @@ CREATE VIEW latestinfos AS
   WHERE (infos.ts = ( SELECT latesttimestamp(infos.nick) AS latesttimestamp));
 
 
-ALTER TABLE public.latestinfos OWNER TO infobot;
+ALTER TABLE latestinfos OWNER TO infobot;
 
 --
--- TOC entry 1900 (class 2604 OID 16588)
+-- Name: tells; Type: TABLE; Schema: public; Owner: infobot
+--
+
+CREATE TABLE tells (
+    tellid integer NOT NULL,
+    from_nick character varying(64) NOT NULL,
+    to_nick character varying(64) NOT NULL,
+    message text NOT NULL,
+    begints timestamp without time zone DEFAULT timezone('utc'::text, now()),
+    fulfilled boolean DEFAULT false
+);
+
+
+ALTER TABLE tells OWNER TO infobot;
+
+--
+-- Name: tells_tellid_seq; Type: SEQUENCE; Schema: public; Owner: infobot
+--
+
+CREATE SEQUENCE tells_tellid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE tells_tellid_seq OWNER TO infobot;
+
+--
+-- Name: tells_tellid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: infobot
+--
+
+ALTER SEQUENCE tells_tellid_seq OWNED BY tells.tellid;
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: infobot
 --
 
@@ -387,7 +396,6 @@ ALTER TABLE ONLY bots ALTER COLUMN id SET DEFAULT nextval('bots_id_seq'::regclas
 
 
 --
--- TOC entry 1898 (class 2604 OID 16408)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: infobot
 --
 
@@ -395,8 +403,14 @@ ALTER TABLE ONLY infos ALTER COLUMN id SET DEFAULT nextval('infos_id_seq'::regcl
 
 
 --
--- TOC entry 1902 (class 2606 OID 16447)
--- Name: alias_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
+-- Name: tellid; Type: DEFAULT; Schema: public; Owner: infobot
+--
+
+ALTER TABLE ONLY tells ALTER COLUMN tellid SET DEFAULT nextval('tells_tellid_seq'::regclass);
+
+
+--
+-- Name: alias_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
 --
 
 ALTER TABLE ONLY aliases
@@ -404,8 +418,7 @@ ALTER TABLE ONLY aliases
 
 
 --
--- TOC entry 1906 (class 2606 OID 16590)
--- Name: bots_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
+-- Name: bots_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
 --
 
 ALTER TABLE ONLY bots
@@ -413,8 +426,7 @@ ALTER TABLE ONLY bots
 
 
 --
--- TOC entry 1908 (class 2606 OID 16596)
--- Name: cmdchar_bot_uniq; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
+-- Name: cmdchar_bot_uniq; Type: CONSTRAINT; Schema: public; Owner: infobot
 --
 
 ALTER TABLE ONLY bots
@@ -422,8 +434,7 @@ ALTER TABLE ONLY bots
 
 
 --
--- TOC entry 1904 (class 2606 OID 16413)
--- Name: infos_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
+-- Name: infos_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
 --
 
 ALTER TABLE ONLY infos
@@ -431,8 +442,14 @@ ALTER TABLE ONLY infos
 
 
 --
--- TOC entry 2024 (class 0 OID 0)
--- Dependencies: 6
+-- Name: tells_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
+--
+
+ALTER TABLE ONLY tells
+    ADD CONSTRAINT tells_pkey PRIMARY KEY (tellid);
+
+
+--
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
@@ -444,8 +461,6 @@ GRANT USAGE ON SCHEMA public TO readonly;
 
 
 --
--- TOC entry 2026 (class 0 OID 0)
--- Dependencies: 172
 -- Name: infos; Type: ACL; Schema: public; Owner: infobot
 --
 
@@ -456,8 +471,6 @@ GRANT SELECT ON TABLE infos TO readonly;
 
 
 --
--- TOC entry 2027 (class 0 OID 0)
--- Dependencies: 170
 -- Name: aliases; Type: ACL; Schema: public; Owner: infobot
 --
 
@@ -468,8 +481,6 @@ GRANT SELECT ON TABLE aliases TO readonly;
 
 
 --
--- TOC entry 2028 (class 0 OID 0)
--- Dependencies: 176
 -- Name: bots; Type: ACL; Schema: public; Owner: infobot
 --
 
@@ -478,8 +489,6 @@ REVOKE ALL ON TABLE bots FROM infobot;
 GRANT ALL ON TABLE bots TO infobot;
 GRANT SELECT ON TABLE bots TO readonly;
 
-
--- Completed on 2015-03-16 18:04:05 EET
 
 --
 -- PostgreSQL database dump complete
