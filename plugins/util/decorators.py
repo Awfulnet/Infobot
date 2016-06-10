@@ -37,12 +37,14 @@ def process_privmsg(msg):
     return (nick, chan, msg)
 
 def command(name, regex, admin=False, ppmsg=False):
-    regex = regex.replace('$name', name)
+    if type(regex) == type(''):
+        regex = regex.replace('$name', name)
+        regex = re.compile(regex)
     def decorator(funct):
         @wraps(funct)
         def new_func(bot, pmsg):
             nick, chan, msg = process_privmsg(pmsg)
-            m = re.search(regex, msg)
+            m = regex.search(msg)
             if ' ' in msg:
                 arg = msg.split(' ', 1)[1]
             else:
@@ -53,11 +55,13 @@ def command(name, regex, admin=False, ppmsg=False):
             if not bot.auth.isadmin(User.from_host(pmsg["host"])) and admin:
                 return
 
-            if m.groups():
+            groups = m.groupdict() or m.groups()
+
+            if groups:
                 if ppmsg:
-                    funct(bot, nick, chan, m.groups(), arg, pmsg)
+                    funct(bot, nick, chan, groups, arg, pmsg)
                 else:
-                    funct(bot, nick, chan, m.groups(), arg)
+                    funct(bot, nick, chan, groups, arg)
             else:
                 if ppmsg:
                     funct(bot, nick, chan, arg, pmsg)
