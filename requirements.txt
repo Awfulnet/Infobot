@@ -1,4 +1,6 @@
 parsedatetime
+pytz
+regex
 coloredlogs
 humanize
 requests
