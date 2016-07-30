@@ -41,7 +41,7 @@ class Infobot(IRCHandler):
         self.nick = config["nick"]
 
         # Arbitrary bot data
-        self.data = {}
+        self.data = {"topics": {}}
         self.auth = None
 
         self.lock = threading.Lock()
@@ -154,6 +154,14 @@ class Infobot(IRCHandler):
                 for init in plugin.__inits__:
                     init(self)
         logger.info("Loaded %d plugins (%s)", len(plugins), ' ⇒ '.join(plugin.__name__.rsplit('.',1)[1] for plugin in plugins))
+
+
+    @IRCCallback("332") # RPL_TOPIC
+    def topicget(self, msg):
+        chan = msg["arg"].split()[1]
+        chan = chan.lower()
+        arg = msg["arg"].split(':', 1)[1]
+        self.data["topics"][chan] = arg
 
     @IRCCallback("376", "422")
     def welcome(self, msg):
