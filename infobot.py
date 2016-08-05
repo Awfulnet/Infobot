@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+from utils import DotDict
 from utils.irc import IRCHandler
 from utils.threads import HandlerThread
 from utils.events import Event
 from utils.events import Standard as StandardEvents
-from utils.sstate import DotDict
 from utils.decorators import IRCCallback
 from utils.style import Styler
 from utils.plugins import PluginLoader
@@ -96,10 +96,6 @@ class Infobot(IRCHandler):
             self.sock = ssl.wrap_socket(self.sock)
         super().connect()
         self._send("NICK %s" % (bot.config["nick"]))
-
-    def msg(self, chan, msg):
-        """ Send a message to a channel. """
-        self._msg(chan, msg)
 
     @IRCCallback("PRIVMSG")
     def privmsg(self, msg):
