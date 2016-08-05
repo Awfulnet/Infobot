@@ -165,6 +165,15 @@ class Infobot(IRCHandler):
         for channel in self.config["autojoin"]:
             self._send("JOIN :%s" % (channel))
 
+    @IRCCallback("JOIN")
+    def join(self, msg):
+        nick = msg["host"].split("!")[0]
+        chan = msg["arg"][1:]
+
+        self.events.JoinEvent.fire(self, nick, chan)
+        logger.info("[%s] JOIN %s", chan, nick)
+
+
     def has_api(self, key):
         return bool(self.config["apis"].get(key, False))
 

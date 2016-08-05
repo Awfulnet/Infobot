@@ -93,9 +93,7 @@ def send_tell(bot, nick, chan, tell):
 
     db.execute("UPDATE tells SET fulfilled = true WHERE tellid = %s;", (tell.id))
 
-def tell_handler(bot, pmsg):
-    nick, chan, msg = process_privmsg(pmsg)
-
+def tell_handler(bot, nick, chan):
     if nick in tells:
         for tell in tells[nick]:
             send_tell(bot, nick, chan, tell)
@@ -115,7 +113,13 @@ def remind_handler(bot, reminder):
 
     db.execute("UPDATE reminders SET fulfilled = true WHERE id = %s;", (reminder.id,))
 
-__callbacks__ = {"PRIVMSG": [tell_handler]}
+__callbacks__ = {
+    "PRIVMSG": [
+        lambda b,m: tell_handler(b, *process_privmsg(m)[:2])
+    ],
+    "JOIN": [
+        lambda b,m: tell_handler(b, m["host"].split('!')[0], m["arg"][1:])
+    ]}
 
 @command('remind', REMIND_TELL_RE)
 def remind(bot, nick, chan, gr, arg):
