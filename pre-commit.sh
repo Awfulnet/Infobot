@@ -14,7 +14,7 @@ do
 done
 
 if [ -d "test" ]; then
-	python -m unittest discover -s test
+	python3 -m unittest discover -s test
 	if [ $? -eq 1 ]
 	then
 		echo "Error during unit tests, aborting..."
