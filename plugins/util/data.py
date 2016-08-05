@@ -6,7 +6,6 @@ import inspect
 import random
 import gc
 from types import FunctionType
-import math
 import re
 
 def sugar(arg):

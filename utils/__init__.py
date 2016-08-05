@@ -11,13 +11,6 @@ def get_name(f):
         except AttributeError:
             return "unknown"
 
-from . import command
-from . import commandhandler
-from . import parse
-from . import num
-from . import events
-from . import message
-from . import channel
 from types import ModuleType, FunctionType
 import inspect
 import datetime

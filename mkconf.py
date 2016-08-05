@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-import os
 import re
-
-from pprint import pformat as pprint
 
 c = {}
 cfile = open("config.json", "w+")

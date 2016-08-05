@@ -8,14 +8,10 @@ from utils.decorators import IRCCallback
 from utils.style import Styler
 from utils.plugins import PluginLoader
 
-import re
-import traceback
 import json
 import threading
-import datetime
 import time
 import ssl
-import sys
 import logging
 
 VERSION = "1.1.0"

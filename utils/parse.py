@@ -2,11 +2,8 @@
 IRC Parser - parse.py
 """
 
-import inspect
 import traceback
 import re
-import subprocess
-import sys
 
 SED_REGEX = re.compile(r"^(?:(\S+)[:,])?(?:(.+?)/)?s/(.+?)/([^/]+)/?(?:([gixs]{0,4}))?")
 

@@ -2,9 +2,6 @@
 Infobot Authentication Module
 """
 
-from utils.decorators import IRCCallback
-from utils import now
-
 import re
 import threading
 import sys
@@ -39,8 +36,6 @@ class User(object):
 
     def __repr__(self):
         return "%s!%s@%s" % (self.nick, self.user, self.host)
-
-from .util.decorators import init
 
 class Authenticator(object):
     def __init__(self):

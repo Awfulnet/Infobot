@@ -4,15 +4,12 @@ Info functionality
 * depends: database
 """
 from .util.decorators import command, init, process_privmsg
-from .database import Database
 from .sed import Substitution
-from functools import wraps
 from .util.data import get_doc
 from functools import partial
 import re
 import traceback
 import inspect
-from functools import reduce
 import gc
 
 db = None

@@ -6,7 +6,6 @@ from threading import Thread
 import datetime
 from queue import Queue
 import traceback
-import sys
 
 def get_core(item):
     if not hasattr(item, "__core__"):

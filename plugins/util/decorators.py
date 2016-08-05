@@ -1,9 +1,7 @@
+from plugins.auth import User
 from inspect import getmodule
 from functools import wraps
 import re
-
-class User():
-    pass
 
 def init(funct):
     m = getmodule(funct)
@@ -72,4 +70,3 @@ def command(name, regex, admin=False, ppmsg=False):
         return new_func
     return decorator
 
-from plugins.auth import User

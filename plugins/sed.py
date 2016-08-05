@@ -1,8 +1,5 @@
-import itertools
 import re
 import codecs
-import traceback
-from itertools import zip_longest
 import string
 
 string.ascii = [chr(i) for i in range(128)]

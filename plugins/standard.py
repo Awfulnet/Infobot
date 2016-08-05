@@ -1,5 +1,5 @@
 from .util.decorators import init, command
-from .util.data import sugar, lineify, generate_vulgarity
+from .util.data import sugar, lineify
 
 import code
 import datetime

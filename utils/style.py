@@ -3,7 +3,6 @@ Style module
 """
 
 import re
-import inspect
 import random
 import functools
 

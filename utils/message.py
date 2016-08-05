@@ -2,7 +2,6 @@
 Message object "n stuff
 """
 
-from .channel import Channel
 from datetime import datetime
 
 class Message(object):

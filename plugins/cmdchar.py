@@ -1,4 +1,4 @@
-from .util.decorators import command, init
+from .util.decorators import command
 from .util.data import get_doc
 from functools import partial
 

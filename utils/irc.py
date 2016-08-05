@@ -7,13 +7,10 @@ import sys
 from .buffer import Buffer
 from . import parse
 import socket
-from .num import NUM as numerics
 import time
-import traceback
 import types
 import inspect
 import logging
-from . import now
 
 logger = logging.getLogger("irc")
 

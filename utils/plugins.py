@@ -5,9 +5,7 @@ utils.plugins - Plugin loading functionality
 import re
 import fnmatch
 import os
-import importlib.util
 
-from collections import OrderedDict
 from importlib.machinery import SourceFileLoader
 
 DEPENDS_RE = re.compile(r"\* depends: (.+)")
