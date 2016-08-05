@@ -2,16 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.4.6
--- Dumped by pg_dump version 9.5.3
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
@@ -145,7 +141,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: infos; Type: TABLE; Schema: public; Owner: infobot
+-- Name: infos; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
 --
 
 CREATE TABLE infos (
@@ -239,7 +235,7 @@ $$;
 ALTER FUNCTION public.multiinfo(nicks_ character varying[]) OWNER TO infobot;
 
 --
--- Name: aliases; Type: TABLE; Schema: public; Owner: infobot
+-- Name: aliases; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
 --
 
 CREATE TABLE aliases (
@@ -279,7 +275,7 @@ CREATE VIEW aliasinfos AS
 ALTER TABLE aliasinfos OWNER TO infobot;
 
 --
--- Name: bots; Type: TABLE; Schema: public; Owner: infobot
+-- Name: bots; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
 --
 
 CREATE TABLE bots (
@@ -352,7 +348,46 @@ CREATE VIEW latestinfos AS
 ALTER TABLE latestinfos OWNER TO infobot;
 
 --
--- Name: tells; Type: TABLE; Schema: public; Owner: infobot
+-- Name: reminders; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
+--
+
+CREATE TABLE reminders (
+    id integer NOT NULL,
+    from_nick character varying(64) NOT NULL,
+    to_nick character varying(64) NOT NULL,
+    message text NOT NULL,
+    channel text NOT NULL,
+    begints timestamp without time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    endts timestamp without time zone NOT NULL,
+    fulfilled boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE reminders OWNER TO infobot;
+
+--
+-- Name: reminders_id_seq; Type: SEQUENCE; Schema: public; Owner: infobot
+--
+
+CREATE SEQUENCE reminders_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE reminders_id_seq OWNER TO infobot;
+
+--
+-- Name: reminders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: infobot
+--
+
+ALTER SEQUENCE reminders_id_seq OWNED BY reminders.id;
+
+
+--
+-- Name: tells; Type: TABLE; Schema: public; Owner: infobot; Tablespace: 
 --
 
 CREATE TABLE tells (
@@ -403,6 +438,13 @@ ALTER TABLE ONLY infos ALTER COLUMN id SET DEFAULT nextval('infos_id_seq'::regcl
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: infobot
+--
+
+ALTER TABLE ONLY reminders ALTER COLUMN id SET DEFAULT nextval('reminders_id_seq'::regclass);
+
+
+--
 -- Name: tellid; Type: DEFAULT; Schema: public; Owner: infobot
 --
 
@@ -410,7 +452,7 @@ ALTER TABLE ONLY tells ALTER COLUMN tellid SET DEFAULT nextval('tells_tellid_seq
 
 
 --
--- Name: alias_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
+-- Name: alias_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
 --
 
 ALTER TABLE ONLY aliases
@@ -418,7 +460,7 @@ ALTER TABLE ONLY aliases
 
 
 --
--- Name: bots_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
+-- Name: bots_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
 --
 
 ALTER TABLE ONLY bots
@@ -426,7 +468,7 @@ ALTER TABLE ONLY bots
 
 
 --
--- Name: cmdchar_bot_uniq; Type: CONSTRAINT; Schema: public; Owner: infobot
+-- Name: cmdchar_bot_uniq; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
 --
 
 ALTER TABLE ONLY bots
@@ -434,7 +476,7 @@ ALTER TABLE ONLY bots
 
 
 --
--- Name: infos_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
+-- Name: infos_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
 --
 
 ALTER TABLE ONLY infos
@@ -442,7 +484,15 @@ ALTER TABLE ONLY infos
 
 
 --
--- Name: tells_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot
+-- Name: reminders_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
+--
+
+ALTER TABLE ONLY reminders
+    ADD CONSTRAINT reminders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tells_pkey; Type: CONSTRAINT; Schema: public; Owner: infobot; Tablespace: 
 --
 
 ALTER TABLE ONLY tells
