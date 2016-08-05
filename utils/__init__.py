@@ -1,5 +1,12 @@
 """ Initializer for the package utils. """
 
+class DotDict(dict):
+    def __getattribute__(self, name):
+        if name in super().keys():
+                return self[name]
+        return super().__getattribute__(name)
+
+
 def get_name(f):
     if type(f) == ModuleType:
         return f.__name__
