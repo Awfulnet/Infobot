@@ -102,7 +102,7 @@ class Styler(object):
     def minify(self, data):
         """ Rearrange and rewrite control codes to shorten the message. """
         if "\n" in data:
-            return "\n".join(map(minify, data.split("\n")))
+            return "\n".join(map(self.minify, data.split("\n")))
 
         # Step 1. Reduce all contiguous blocks of control codes.
         data = re.sub(r"([\x1d\x02\x1f\x0f\x16]|\x03\d?\d?(,\d\d?)?)+", self.control_reduce, data)
