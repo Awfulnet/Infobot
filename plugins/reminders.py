@@ -12,7 +12,8 @@ import logging
 
 from pytz import timezone
 from .util.decorators import command, init, process_privmsg
-from collections import namedtuple, defaultdict
+from .util.dict import CaseInsensitiveDefaultDict as CIDD
+from collections import namedtuple
 
 logger = logging.getLogger("remind")
 logger.setLevel(logging.DEBUG)
@@ -24,8 +25,8 @@ Reminder = namedtuple("Reminder", ["id", "to_nick", "from_nick", "message", "cha
 calendar = parsedatetime.Calendar()
 
 timers = []
-reminders = defaultdict(list)
-tells = defaultdict(list)
+reminders = CIDD(default=[])
+tells = CIDD(default=[])
 
 REMIND_RE = "\.remind (me|@?[A-z0-9]+) (?:in (.+?) to (.+)$|(?:to )?(.+?) in (.+)$)"
 
