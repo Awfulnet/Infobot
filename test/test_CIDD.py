@@ -2,6 +2,12 @@ import unittest
 from plugins.util.dict import CaseInsensitiveDefaultDict as CIDD
 
 class TestCIDD(unittest.TestCase):
+    def testDelete(self):
+        sample = CIDD()
+        sample["abc"] = 42
+        self.assertEqual(sample, {"abc": 42})
+        del sample["abc"]
+        self.assertEqual(sample, {})
     def testDefaultGet(self):
         """
         This test checks whether the dict behaves as a defaultdict

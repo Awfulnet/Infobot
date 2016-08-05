@@ -31,10 +31,10 @@ class CaseInsensitiveDefaultDict(dict):
                 return
         super().__setitem__(key, value)
 
-    def __delitem__(self, key, value):
-        for k, v in self.items():
+    def __delitem__(self, key):
+        for k in super().keys():
             if (self._k(k) == self._k(key)):
-                super().__delitem__(k)
+                return super().__delitem__(k)
 
     def __contains__(self, key):
         for k, v in self.items():
