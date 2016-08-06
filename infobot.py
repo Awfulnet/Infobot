@@ -58,14 +58,10 @@ class Infobot(IRCHandler):
         return "Infobot(server=%r)" % (self.config["server"].split(':')[0])
 
     def _msg(self, chan, msg):
-        self.sock.send(b"PRIVMSG ")
-        self.sock.send(("%s :%s" % (chan, msg)).encode('utf-8'))
-        self.sock.send(b"\r\n")
+        self._send("PRIVMSG {} :{}".format(chan, msg))
 
     def notice(self, chan, msg):
-        self.sock.send(b"NOTICE ")
-        self.sock.send(("%s :%s" % (chan, msg)).encode('utf-8'))
-        self.sock.send(b"\r\n")
+        self._send("NOTICE {} :{}".format(chan, msg))
 
     def msg(self, chan, msg):
         msg = str(msg).replace("\r", "")
