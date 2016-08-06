@@ -181,3 +181,4 @@ if __name__ == "__main__":
     config = json.load(open("config.json", "r"))
     bot = Infobot(config)
     bot.connect()
+    bot.run()
