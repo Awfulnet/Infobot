@@ -39,6 +39,16 @@ class IRCHandler(object):
             pass
         self.mainloop()
 
+    def handle_messages(self):
+        for msg in self.buff:
+            pmsg = parse.parse(msg)
+            if pmsg["method"] == "PING":
+                self._send("PONG "+pmsg["arg"])
+            elif pmsg["method"] in ("376", "422"):
+                self.is_welcome = True
+                self.run_callback(pmsg["method"], pmsg)
+            else:
+                self.run_callback(pmsg["method"], pmsg)
     def mainloop(self):
         """ The main loop. """
         loops = 0
@@ -54,15 +64,6 @@ class IRCHandler(object):
                     self.sendnick()
                     self.senduser()
 
-                for msg in self.buff:
-                    pmsg = parse.parse(msg)
-                    if pmsg["method"] == "PING":
-                        self._send("PONG "+pmsg["arg"])
-                    elif pmsg["method"] in ("376", "422"):
-                        self.is_welcome = True
-                        self.run_callback(pmsg["method"], pmsg)
-                    else:
-                        self.run_callback(pmsg["method"], pmsg)
                 loops += 1
         except KeyboardInterrupt:
             sys.exit()
