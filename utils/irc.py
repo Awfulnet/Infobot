@@ -51,20 +51,18 @@ class IRCHandler(object):
                 self.run_callback(pmsg["method"], pmsg)
     def mainloop(self):
         """ The main loop. """
-        loops = 0
+        self.sock_file = self.sock.makefile('rb')
+        self.sendnick()
+        self.senduser()
         try:
             while self.running:
-                if loops != 0:
-                    data = self.sock_file.readline().decode('utf-8', errors='ignore')
-                    if data == '':
-                        self.running = False
-                    self.buff.append(data)
-                else:
-                    self.sock_file = self.sock.makefile('rb')
-                    self.sendnick()
-                    self.senduser()
+                data = self.sock_file.readline().decode('utf-8', errors='ignore')
+                if data == '':
+                    self.running = False
+                self.buff.append(data)
 
-                loops += 1
+                self.handle_messages()
+
         except KeyboardInterrupt:
             sys.exit()
 
