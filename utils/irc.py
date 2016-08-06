@@ -7,7 +7,6 @@ import sys
 from .buffer import Buffer
 from . import parse
 import socket
-import time
 import types
 import inspect
 import logging
@@ -72,8 +71,7 @@ class IRCHandler(object):
         """ Send data through the socket and append CRLF. """
         self.outbuff.append(data+newline)
         for msg in self.outbuff:
-            self.sock.send((msg+newline).encode("utf-8"))
-            time.sleep(.01)
+            self.sock.sendall((msg+newline).encode("utf-8"))
 
     def run_callback(self, cname, *args):
         noncore = False
