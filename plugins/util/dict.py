@@ -49,7 +49,7 @@ class CaseInsensitiveDefaultDict(dict):
         return super().pop(key, *args, **kwargs)
 
     def get(self, key, *args, **kwargs):
-        for k, v in self.items():
-            if (self._k() == self._k(key)):
+        for k in self.keys():
+            if (self._k(k) == self._k(key)):
                 return super().get(k, *args, **kwargs)
         return super().get(key, *args, **kwargs)
