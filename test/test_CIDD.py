@@ -2,6 +2,35 @@ import unittest
 from plugins.util.dict import CaseInsensitiveDefaultDict as CIDD
 
 class TestCIDD(unittest.TestCase):
+    def testContains(self):
+        sample = CIDD()
+        sample["aBc"] = 42
+        self.assertTrue("aBc" in sample)
+        self.assertTrue("abc" in sample)
+
+    def testPop(self):
+        sample = CIDD()
+        sample["aBc"] = 42
+        self.assertEqual(sample.pop("aBc"), 42)
+
+        # Test case-insensitive compare
+        sample["aBc"] = 42
+        self.assertEqual(sample.pop("abc"), 42)
+
+        # Test default value pop
+        default = "Life, the Universe and Everything"
+        self.assertEqual(sample.pop("abc", default), default)
+
+    def testGet(self):
+        sample = CIDD()
+        sample["aBc"] = 42
+        self.assertEqual(sample.get("abc"), 42)
+
+        del sample["abc"]
+
+        default = "Life, the Universe and Everything"
+        self.assertEqual(sample.get("abc", default), default)
+
     def testDelete(self):
         sample = CIDD()
         sample["abc"] = 42
