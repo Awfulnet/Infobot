@@ -22,7 +22,11 @@ class PluginLoader(object):
         self.graph = {}
         files = fnmatch.filter(os.listdir('./plugins'), "*.py")
         for f in files:
-            for line in open(os.path.join(self.directory, f)):
+            self.parseDepends(f)
+
+    def parseDepends(self, f):
+        with open(os.path.join(self.directory, f)) as fobj:
+            for line in fobj:
                 match = DEPENDS_RE.search(line)
                 if match:
                     self.graph[f] = match.group(1).split(', ')
