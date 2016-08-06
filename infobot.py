@@ -73,7 +73,7 @@ class Infobot(IRCHandler):
 
     @IRCCallback("INVITE")
     def handleinvite(self, pmsg):
-        bot._send("JOIN :" + pmsg["arg"].split(":")[1])
+        self._send("JOIN :" + pmsg["arg"].split(":")[1])
 
     def switch(self):
         self.lock.release()
