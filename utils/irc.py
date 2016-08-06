@@ -28,7 +28,7 @@ class IRCHandler(object):
         self.is_welcome = False
 
     def connect(self):
-        """ Connect to the IRC server and start the main loop """
+        """ Connect to the IRC server """
         server = CONFIG["server"].split("|")[0].split(":")
         self.sock.connect((server[0], int(server[1])))
         try:
@@ -37,7 +37,6 @@ class IRCHandler(object):
                 self._send("PASS "+passwd)
         except:
             pass
-        self.mainloop()
 
     def handle_messages(self):
         for msg in self.buff:
@@ -49,7 +48,8 @@ class IRCHandler(object):
                 self.run_callback(pmsg["method"], pmsg)
             else:
                 self.run_callback(pmsg["method"], pmsg)
-    def mainloop(self):
+
+    def run(self):
         """ The main loop. """
         self.sock_file = self.sock.makefile('rb')
         self.sendnick()
