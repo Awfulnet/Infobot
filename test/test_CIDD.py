@@ -35,8 +35,10 @@ class TestCIDD(unittest.TestCase):
         sample = CIDD()
         sample["abc"] = 42
         self.assertEqual(sample, {"abc": 42})
-        del sample["abc"]
+
+        del sample["aBc"]
         self.assertEqual(sample, {})
+
     def testDefaultGet(self):
         """
         This test checks whether the dict behaves as a defaultdict
