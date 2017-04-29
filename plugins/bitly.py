@@ -27,7 +27,7 @@ def urlfinder(bot, nick, chan, msg):
         return
     print(urls)
     short_urls = [_shorten(bot,url) for url in urls if len(url) > 90]
-    short_urls = ["%s %s" % (bot.style.grey("(%d)" % i), bot.style.lblue(url))
+    short_urls = ["%s%s" % (bot.style.grey("(%d)" % i), bot.style.lblue(" " + url))
             for i, url in enumerate(short_urls)]
     separator = bot.style.grey(", ")
     output = separator.join(short_urls)
