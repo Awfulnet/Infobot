@@ -52,6 +52,49 @@ def addinfo(bot, pmsg):
 
 __callbacks__ = {"PRIVMSG": [addinfo]}
 
+@command('infohist', '^!$name(\s|$)')
+def getinfohist(bot, nick, chan, gr, arg):
+    """!infohist -> get your info history. """
+    if not arg:
+        arg = 0
+    else:
+        try:
+            arg = int(arg)
+        except:
+            arg = 0
+
+    info = db.execute("SELECT nick, info FROM infohistory(%s);", (nick,)).fetchall()
+
+    if not info:
+        return bot.notice(nick, "No info found for {0}.".format(nick))
+
+    for n, item in list(enumerate(info))[::-1][int(arg):int(arg)+6]:
+        bot.notice(nick, "#%d: %s →  %s: %s" % (n, arg, item[0], item[1]))
+
+@command('inforestore', '^!$name(?:\s|$)', ppmsg=True)
+def inforestore(bot, nick, chan, arg, pmsg):
+    """!inforestore <n> -> set your info to a previous info. """
+    try:
+        arg = int(arg)
+    except:
+        return bot._msg(chan, get_doc())
+
+    if not arg:
+        return bot._msg(chan, get_doc())
+
+    user, host = pmsg['host'].split("@")
+    user = user.split("!")[1]
+
+    info = db.execute("SELECT nick, info FROM infohistory(%s);", (nick,)).fetchall()
+
+    if not info:
+        return bot.notice(nick, "No info found for {0}.".format(nick))
+
+    toset = info[arg]
+
+    db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, toset[1]))
+    bot.notice(nick, "Info set to '%s'" % (toset[1]))
+
 
 @command('info', '^(!|@)$name(\s|$)')
 def getinfo(bot, nick, chan, gr, arg):
