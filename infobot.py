@@ -94,6 +94,9 @@ class Infobot(IRCHandler):
         if not msg["arg"].startswith("#"):
             self.nick = msg["arg"].split(" ", 1)[0]
 
+        self.events.ModeEvent.fire(msg)
+
+
     def connect(self):
         self.cmd_thread.start()
         if self.config["ssl"]:
