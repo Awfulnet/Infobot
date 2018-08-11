@@ -2,56 +2,75 @@
 utils.plugins - Plugin loading functionality
 """
 
-import re
-import fnmatch
-import os
+from pathlib import Path
 
-from importlib.machinery import SourceFileLoader
+import importlib
+import re
 
 DEPENDS_RE = re.compile(r"\* depends: (.+)")
 
+
 class PluginLoader(object):
     """
-    The plugin loader
-    Generates a dependency graph and returns a list of loaded modules
-    when load_all() is called.
-    """
-    def __init__(self):
-        """ Initializes the PluginLoader by generating a dependency graph """
-        self.directory = './plugins'
-        self.graph = {}
-        files = fnmatch.filter(os.listdir('./plugins'), "*.py")
-        for f in files:
-            self.parseDepends(f)
+    Infobot's plugin loader.
 
-    def parseDepends(self, f):
-        with open(os.path.join(self.directory, f)) as fobj:
-            for line in fobj:
+    Generates a dependency graph and returns a list of loaded modules when
+    load_all() is called.
+    """
+    def __init__(self, plugin_directory="plugins"):
+        """ Initializes the PluginLoader by generating a dependency graph """
+        self.plugin_package = self.plugin_directory = plugin_directory
+        self.graph = {}
+
+        path = Path(self.plugin_directory)
+        plugin_paths = []
+        for subpath in path.iterdir():
+            if (subpath.is_dir() and (subpath / '__init__.py').exists()) or \
+               (subpath.name.endswith('.py')):
+                plugin_paths.append(subpath)
+
+        for path in plugin_paths:
+            self.parseDepends(path)
+
+    def parseDepends(self, path):
+        if path.is_dir():
+            main_file = str(path / '__init__.py')
+        else:
+            main_file = str(path)
+
+        with open(main_file) as plugin:
+            for line in plugin:
                 match = DEPENDS_RE.search(line)
                 if match:
-                    self.graph[f] = match.group(1).split(', ')
-            if f not in self.graph and f != '__init__.py':
-                # This plugin does not yet define a dependency line, and therefore has no dependencies
-                self.graph[f] = []
+                    self.graph[path] = match.group(1).split(', ')
+            if path not in self.graph and path.name != '__init__.py':
+                # This plugin does not yet define a dependency line.
+                # Therefore, we act like it has no dependencies.
+                self.graph[path] = []
 
-    def load_plugin(self, plugin_filename, name=None):
-        if name is None:
-            name = "plugins." + plugin_filename[:-3]
-        plugin = SourceFileLoader(name, os.path.join(self.directory, plugin_filename)).load_module()
+    def load_plugin(self, plugin_path, name=None):
+        if not name:
+            name = f"{self.plugin_package}." + plugin_path.stem
+
+        plugin = importlib.import_module(name)
         return plugin
 
     def load_all(self):
         plugins = []
         self.load_plugin('__init__.py', name='plugins')
         while (self.graph):
-            satisfied_plugins = dict(filter(lambda x: not x[1], self.graph.items()))
+            satisfied_plugins = {plugin:deps for plugin,deps in self.graph.items()
+                                 if not deps}
+
             for satisfied_plugin, _ in satisfied_plugins.items():
                 plugins.append(self.load_plugin(satisfied_plugin))
                 del self.graph[satisfied_plugin]
                 for plugin, deps in self.graph.items():
-                    # This try clause is here because .remove errors when the item is not in the list
+                    # This try clause is here because .remove throws when the
+                    # item is not in the list
                     try:
-                        deps.remove(satisfied_plugin[:-3])
+                        deps.remove(satisfied_plugin.stem)
                     except ValueError:
                         pass
+
         return plugins
