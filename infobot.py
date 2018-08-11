@@ -14,6 +14,13 @@ import time
 import ssl
 import logging
 
+try:
+    import sdnotify
+except ImportError:
+    sdnotify = None
+    print("sd_notify support missing, not notifying systemd of startup success")
+
+
 VERSION = "1.1.0"
 
 LOGLEVEL = logging.DEBUG
@@ -181,4 +188,9 @@ if __name__ == "__main__":
     config = json.load(open("config.json", "r"))
     bot = Infobot(config)
     bot.connect()
+
+    if (sdnotify):
+        # Notify systemd that the service startup is complete.
+        sdnotify.SystemdNotifier().notify("READY=1")
+
     bot.run()

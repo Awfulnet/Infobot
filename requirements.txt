@@ -6,3 +6,4 @@ regex
 coloredlogs
 humanize
 requests
+sdnotify
