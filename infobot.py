@@ -10,9 +10,9 @@ from core.plugins import PluginLoader
 
 import json
 import threading
-import time
 import ssl
 import logging
+import ctypes
 
 try:
     import sdnotify
@@ -20,6 +20,7 @@ except ImportError:
     sdnotify = None
     print("sd_notify support missing, not notifying systemd of startup success")
 
+libc = ctypes.CDLL("libc.so.6")
 
 VERSION = "1.1.0"
 
@@ -84,7 +85,7 @@ class Infobot(IRCHandler):
 
     def switch(self):
         self.lock.release()
-        time.sleep(0.01)
+        libc.sched_yield()
         self.lock.acquire()
 
     @IRCCallback("MODE")
