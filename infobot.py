@@ -24,8 +24,8 @@ libc = ctypes.CDLL("libc.so.6")
 
 VERSION = "1.1.0"
 
-LOGLEVEL = logging.DEBUG
-FORMAT = "[%(asctime)s] [%(levelname)7s] %(name)7s: %(message)s"
+LOGLEVEL = logging.INFO
+FORMAT = "[%(asctime)s %(msecs)d] [%(levelname)7s] %(name)7s: %(message)s"
 logging.basicConfig(filename="infobot.log", level=LOGLEVEL)
 logger = logging.getLogger("infobot")
 

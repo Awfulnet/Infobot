@@ -6,6 +6,9 @@ import re
 import threading
 import sys
 from functools import partial
+import logging
+
+logger = logging.getLogger("auth")
 
 def printish(stuff):
     sys.__stdout__.write(stuff + '\n')
@@ -45,6 +48,7 @@ class Authenticator(object):
         self.wakeupCond = threading.Condition()
 
     def isadmin(self, person):
+        logger.debug(f"Checking whether {person} is an admin.")
         return True if person.nick in self.admins and self.admins[person.nick].host == person.host else False
 
     def addadmin(self, *person):
