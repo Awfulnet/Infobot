@@ -30,7 +30,7 @@ tells = CIDD(default=[])
 
 REMIND_RE = "\.remind (me|@?[A-z0-9]+) (?:in (.+?) to (.+)$|(?:to )?(.+?) in (.+)$)"
 
-REMIND_TELL_RE = regex.compile(r"""
+REMIND_TELL_RE = regex.compile(r"""^
     \.(?:tell|remind)\s
         (?P<nick> me|@? [A-z0-9]+)\s
         (?:
