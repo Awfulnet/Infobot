@@ -5,6 +5,7 @@ Standard = [
     {"ModeEvent": "mode"},
     {"JoinEvent": "join"},
     {"PartEvent": "part"},
+    {"NamesEvent": "names"},
     {"MessageEvent": "message"},
     {"NoticeEvent": "notice"},
     {"ShutdownEvent": "shutdown"},
