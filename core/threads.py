@@ -3,9 +3,9 @@ Threads module
 """
 
 from threading import Thread
-import datetime
 from queue import Queue
 import traceback
+import logging
 
 def get_core(item):
     if not hasattr(item, "__core__"):
@@ -15,6 +15,7 @@ def get_core(item):
 class HandlerThread(Thread):
     def __init__(self, bot, lock):
         self.bot = bot
+        self.logger = logging.getLogger("command")
         self.queue = Queue()
         self.lock = lock
         super().__init__()
@@ -26,11 +27,11 @@ class HandlerThread(Thread):
                 args = self.queue.get()
                 with self.lock:
                     items = self.bot.__irccallbacks__[args[0]]
-                
+
                 for item in items:
                     if not get_core(item):
                         if self.bot.verbose:
-                            print("[command thread:%s] calling fn %s" % (datetime.datetime.utcnow(), item.__name__))
+                            self.logger.info("Calling function: %s" % item.__name__)
                         item(self.bot, *(args[1]))
 
             except BaseException as e:

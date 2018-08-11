@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-from utils import DotDict
-from utils.irc import IRCHandler
-from utils.threads import HandlerThread
-from utils.events import Event
-from utils.events import Standard as StandardEvents
-from utils.decorators import IRCCallback
-from utils.style import Styler
-from utils.plugins import PluginLoader
+from core import DotDict
+from core.irc import IRCHandler
+from core.threads import HandlerThread
+from core.events import Event
+from core.events import Standard as StandardEvents
+from core.decorators import IRCCallback
+from core.style import Styler
+from core.plugins import PluginLoader
 
 import json
 import threading

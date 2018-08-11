@@ -2,6 +2,7 @@ import traceback
 
 Standard = [
     {"WelcomeEvent": "welcome"},
+    {"ModeEvent": "mode"},
     {"JoinEvent": "join"},
     {"PartEvent": "part"},
     {"MessageEvent": "message"},
