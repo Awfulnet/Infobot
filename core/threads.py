@@ -30,8 +30,7 @@ class HandlerThread(Thread):
 
                 for item in items:
                     if not get_core(item):
-                        if self.bot.verbose:
-                            self.logger.info("Calling function: %s" % item.__name__)
+                        self.logger.debug("Calling function: %s" % item.__name__)
                         item(self.bot, *(args[1]))
 
             except BaseException as e:
