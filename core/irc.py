@@ -17,11 +17,12 @@ CONFIG = {}
 
 class IRCHandler(object):
     """ IRCHandler(Dict<string, object> config) - a standard IRC handler """
-    def __init__(self, bconfig, verbose=False):
+    def __init__(self, bconfig, verbose=False, print_raw=False):
         globals()["CONFIG"] = bconfig
         self.sock = socket.socket()
         self.sock_file = None
         self.verbose = verbose
+        self.print_raw = print_raw
         self.running = True
         self.buff = Buffer()
         self.outbuff = Buffer()
@@ -59,6 +60,8 @@ class IRCHandler(object):
                 data = self.sock_file.readline().decode('utf-8', errors='ignore')
                 if data == '':
                     self.running = False
+                if self.print_raw:
+                    print(data.strip())
                 self.buff.append(data)
 
                 self.handle_messages()
@@ -70,6 +73,8 @@ class IRCHandler(object):
         """ Send data through the socket and append CRLF. """
         self.outbuff.append(data+newline)
         for msg in self.outbuff:
+            if self.print_raw:
+                print(msg.strip())
             self.sock.sendall((msg+newline).encode("utf-8"))
 
     def run_callback(self, cname, *args):

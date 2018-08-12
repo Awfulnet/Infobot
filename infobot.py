@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""
+Infobot - an IRC bot that handles user information on the Subluminal network.
+© 2014-2018 Sam van Kampen, Simmo Saan and contributors
+
+Usage: infobot.py [options]
+       infobot.py (-h|--help)
+       infobot.py --version
+
+Options:
+    --debug, -d     Sets logging level to DEBUG
+    --raw, -r       Show raw protocol traffic
+"""
 from core import DotDict
 from core.irc import IRCHandler
 from core.threads import HandlerThread
@@ -13,6 +25,7 @@ import threading
 import ssl
 import logging
 import ctypes
+from docopt import docopt
 
 try:
     import sdnotify
@@ -25,20 +38,18 @@ libc = ctypes.CDLL("libc.so.6")
 VERSION = "1.1.0"
 
 LOGLEVEL = logging.INFO
-FORMAT = "[%(asctime)s %(msecs)d] [%(levelname)7s] %(name)7s: %(message)s"
-logging.basicConfig(filename="infobot.log", level=LOGLEVEL)
-logger = logging.getLogger("infobot")
+FORMAT = "[%(asctime)s %(msecs)3d] [%(levelname)7s] %(name)7s: %(message)s"
 
 import coloredlogs
 
 class Infobot(IRCHandler):
     """ Infobot main class """
-    def __init__(self, config):
+    def __init__(self, config, args):
         self.register_logger()
 
         logger.info("Infobot version %s", VERSION)
-        logger.info("© 2014-2016 Sam van Kampen, Simmo Saan and contributors")
-        super().__init__(config, verbose=False)
+        logger.info("© 2014-2018 Sam van Kampen, Simmo Saan and contributors")
+        super().__init__(config, verbose=args['--debug'], print_raw=args['--raw'])
 
         self.style = Styler()
         self.config = config
@@ -189,8 +200,18 @@ class Infobot(IRCHandler):
 
 
 if __name__ == "__main__":
+    args = docopt(__doc__, version=VERSION)
+
+    debug = args['--debug']
+    if debug:
+        DEBUG = debug
+        LOGLEVEL = logging.DEBUG
+
+    logging.basicConfig(filename="infobot.log", level=LOGLEVEL)
+    logger = logging.getLogger("infobot")
+
     config = json.load(open("config.json", "r"))
-    bot = Infobot(config)
+    bot = Infobot(config, args)
     bot.connect()
 
     if (sdnotify):

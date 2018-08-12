@@ -7,3 +7,4 @@ coloredlogs
 humanize
 requests
 sdnotify
+docopt
