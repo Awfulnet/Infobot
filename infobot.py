@@ -21,6 +21,7 @@ from core.style import Styler
 from core.plugins import PluginLoader
 
 import json
+import re
 import threading
 import ssl
 import logging
@@ -218,6 +219,32 @@ class Infobot(IRCHandler):
         self._send("MODE %s +B" % (self.nick))
 
         self.events.Welcome.fire()
+
+
+    @IRCCallback("353") # RPL_NAMREPLY
+    def _names(self, msg):
+        if ('userhost-in-names' not in self.current_caps):
+            # We only support UHNAMES parsing.
+            return
+
+        channel_type, channel_name = re.match(r"\S+ ([=@*]) (#\S+)",
+                                              msg["arg"]).groups()
+
+        user_list = msg["arg"].split(':', 1)[1]
+        users = re.findall(r"([+%@&~]*)(\S+?)!(\S+?)@(\S+)", user_list)
+
+        users_as_dict = []
+        for user in users:
+            modes, nick, user, host = user
+            users_as_dict.append({"modes": modes, "nick": nick, "user": user,
+                                  "host": host})
+
+        self.events.Names.fire(self, channel_type, channel_name, users_as_dict)
+
+    @IRCCallback("366") # RPL_NAMESEND
+    def _namesend(self, msg):
+        channel = msg["arg"].split()[1]
+        self.events.NamesEnd.fire(self, channel)
 
     @IRCCallback("JOIN")
     def join(self, msg):
