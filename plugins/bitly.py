@@ -72,4 +72,4 @@ def plugin_initializer(bot):
     """ Initialize this plugin. """
     if (bot.has_api("bit.ly")):
         bot.data["urlhistory"] = []
-        bot.events.MessageEvent.register(urlfinder)
+        bot.events.Message.register(urlfinder)

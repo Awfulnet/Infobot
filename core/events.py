@@ -1,17 +1,7 @@
 import traceback
 
-Standard = [
-    {"WelcomeEvent": "welcome"},
-    {"ModeEvent": "mode"},
-    {"JoinEvent": "join"},
-    {"PartEvent": "part"},
-    {"NamesEvent": "names"},
-    {"MessageEvent": "message"},
-    {"NoticeEvent": "notice"},
-    {"ShutdownEvent": "shutdown"},
-    {"KickEvent": "kick"},
-    {"CommandCalledEvent": "cmd"}
-]
+Standard = ("Welcome", "Mode", "Join", "Part", "Names", "NamesEnd", "Message",
+            "Notice", "Shutdown", "Kick", "CommandCalled", "ChannelMode")
 
 class HandlerSet(set):
     def __getattribute__(self, name):

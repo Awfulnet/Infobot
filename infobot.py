@@ -62,8 +62,7 @@ class Infobot(IRCHandler):
         self.lock = threading.Lock()
         self.lock.acquire()
 
-        self.events = DotDict({list(i.keys())[0]: Event(list(i.values())[0])
-            for i in StandardEvents})
+        self.events = DotDict({name:Event(name) for name in StandardEvents})
 
         self.cmd_thread = HandlerThread(self, self.lock)
         self.cmd_thread.daemon = True
@@ -105,7 +104,7 @@ class Infobot(IRCHandler):
         if not msg["arg"].startswith("#"):
             self.nick = msg["arg"].split(" ", 1)[0]
 
-        self.events.ModeEvent.fire(msg)
+        self.events.Mode.fire(msg)
 
 
     def connect(self):
@@ -126,7 +125,7 @@ class Infobot(IRCHandler):
             chan = nick
         msg = msg["arg"].split(":", 1)[1]
 
-        self.events.MessageEvent.fire(self, nick, chan, msg)
+        self.events.Message.fire(self, nick, chan, msg)
         logger.info("[%s] <%s> %s" , chan, nick, msg)
 
     @IRCCallback("NOTICE")
@@ -188,8 +187,8 @@ class Infobot(IRCHandler):
         nick = msg["host"].split("!")[0]
         chan = msg["arg"][1:]
 
-        self.events.JoinEvent.fire(self, nick, chan)
         logger.info("[%s] JOIN %s", chan, nick)
+        self.events.Join.fire(self, nick, chan)
 
 
     def has_api(self, key):
