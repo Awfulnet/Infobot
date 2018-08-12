@@ -57,6 +57,8 @@ class Infobot(IRCHandler):
 
         # Arbitrary bot data
         self.data = {"topics": {}}
+
+        self.current_caps = set()
         self.auth = None
 
         self.lock = threading.Lock()
@@ -189,15 +191,33 @@ class Infobot(IRCHandler):
         arg = msg["arg"].split(':', 1)[1]
         self.data["topics"][chan] = arg
 
+    @IRCCallback("CAP")
+    def cap_reply(self, msg):
+        cap_method = msg["arg"].split()[1]
+        if (cap_method == 'ACK'):
+            caps = msg["arg"].split(':')[1]
+            self.current_caps |= set(caps.split())
+            logger.info("Acknowleged CAPs: " + caps)
+
+            for channel in self.user_channel_manager.channels.keys():
+                # Workaround for ZNC sending JOINS before ACKing CAPs
+                logger.debug("Sending NAMES for " + channel)
+                self._send(f"NAMES {channel}")
+
+            for channel in self.config["autojoin"]:
+                self._send("JOIN :%s" % (channel))
+
     @IRCCallback("376", "422")
     def welcome(self, msg):
         if self.config.get("ident_pass", None):
             self._msg(self.config["ident_service"], "identify %s"
                 % (self.config["ident_pass"]))
+
+        # Enable IRCv3 userhost-in-names and multi-prefix
+        self._send("CAP REQ :userhost-in-names multi-prefix")
         self._send("MODE %s +B" % (self.nick))
 
-        for channel in self.config["autojoin"]:
-            self._send("JOIN :%s" % (channel))
+        self.events.Welcome.fire()
 
     @IRCCallback("JOIN")
     def join(self, msg):
