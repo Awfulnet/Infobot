@@ -12,9 +12,18 @@ def parse(msg):
     if msg.startswith("PING"):
         info = {"method": "PING", "arg": msg.split()[-1]}
     else:
-        splitmsg = msg.split(" ", 2)
-        info = {"method": splitmsg[1], "host": splitmsg[0][1:], "arg":
-                splitmsg[2]}
+        parts = msg.split(" ", 2)
+        has_trailing = ' :' in msg
+        if has_trailing:
+            args = parts[2].rsplit(' :', 1)
+            if len(args) == 2:
+                args = [*args[0].split(), args[1]]
+        else:
+            args = parts[2].split()
+
+        info = {"method": parts[1], "host": parts[0][1:], "arg":
+                parts[2], "args": args}
+
     return info
 
 def evaluate(self, nick, chan, msg):
