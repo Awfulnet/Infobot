@@ -15,7 +15,7 @@ def get_core(item):
 class HandlerThread(Thread):
     def __init__(self, bot, lock):
         self.bot = bot
-        self.logger = logging.getLogger("command")
+        self.logger = logging.getLogger("handler-thread")
         self.queue = Queue()
         self.lock = lock
         super().__init__()
