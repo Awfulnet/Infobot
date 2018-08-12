@@ -36,7 +36,7 @@ except ImportError:
 
 libc = ctypes.CDLL("libc.so.6")
 
-VERSION = "1.1.0"
+VERSION = "2.0.0"
 
 LOGLEVEL = logging.INFO
 FORMAT = "[%(asctime)s %(msecs)3d] [%(levelname)7s] %(name)7s: %(message)s"
@@ -248,11 +248,12 @@ class Infobot(IRCHandler):
 
     @IRCCallback("JOIN")
     def join(self, msg):
-        nick = msg["host"].split("!")[0]
         chan = msg["arg"][1:]
+        host = msg["host"]
 
-        logger.info("[%s] JOIN %s", chan, nick)
-        self.events.Join.fire(self, nick, chan)
+        self._send(f"MODE {chan}")
+
+        self.events.Join.fire(self, host, chan)
 
 
     def has_api(self, key):
