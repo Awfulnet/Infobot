@@ -69,6 +69,8 @@ class Infobot(IRCHandler):
         self.register_callbacks()
         self.register_plugins()
 
+        self.server_supports = DotDict()
+
         for item in self.config["admins"]:
             self.auth.addadmin(item[0], item[1], item[2])
 
@@ -88,6 +90,16 @@ class Infobot(IRCHandler):
                 self._msg(chan, item)
         else:
             self._msg(chan, msg)
+
+    @IRCCallback("005") # RPL_ISUPPORT
+    def isupport(self, msg):
+        opts = msg["args"][:-1] # skip :are supported by this server
+        for opt in opts:
+            if '=' in opt:
+                k, v = opt.split('=')
+            else:
+                k, v = opt, True
+            self.server_supports[k] = v
 
     @IRCCallback("INVITE")
     def handleinvite(self, pmsg):
