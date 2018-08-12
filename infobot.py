@@ -118,6 +118,11 @@ class Infobot(IRCHandler):
 
         self.events.Mode.fire(msg)
 
+    @IRCCallback("324") # RPL_CHANNELMODEIS
+    def channel_mode(self, msg):
+        client, channel, modestring, *rest = msg["args"]
+        modeargs = ' '.join(rest)
+        self.events.ChannelMode.fire(self, channel, modestring[1:], modeargs)
 
     def connect(self):
         self.cmd_thread.start()
