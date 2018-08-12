@@ -19,8 +19,6 @@ def import_merge(name):
     modpath = Path(module.__path__[0])
     package = module.__package__
 
-    print(package)
-
     to_load = []
     for subpath in modpath.iterdir():
         if subpath.name.endswith('.py') and subpath.name != '__init__.py':
