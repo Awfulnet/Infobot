@@ -6,6 +6,9 @@ from pathlib import Path
 
 import importlib
 import re
+import logging
+
+logger = logging.getLogger("plugin-loader")
 
 DEPENDS_RE = re.compile(r"\* depends: (.+)")
 
@@ -42,6 +45,11 @@ class PluginLoader(object):
 
         with open(main_file) as plugin:
             for line in plugin:
+                if '* noload' in line:
+                    logger.info(f"Not loading plugin {path.stem}"
+                                 "due to noload directive")
+                    return
+
                 match = DEPENDS_RE.search(line)
                 if match:
                     self.graph[path] = match.group(1).split(', ')
