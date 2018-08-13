@@ -66,6 +66,8 @@ class Infobot(IRCHandler):
         self.current_caps = set()
         self.auth = None
 
+        self.channels = []
+
         self.lock = threading.Lock()
         self.lock.acquire()
 
@@ -210,9 +212,9 @@ class Infobot(IRCHandler):
             self.current_caps |= set(caps.split())
             logger.info("Acknowleged CAPs: " + caps)
 
-            for channel in self.user_channel_manager.channels.keys():
+            for channel in self.channels:
                 # Workaround for ZNC sending JOINS before ACKing CAPs
-                logger.debug("Sending NAMES for " + channel)
+                logger.debug(f"Sending NAMES for {channel}")
                 self._send(f"NAMES {channel}")
 
             for channel in self.config["autojoin"]:
@@ -263,6 +265,7 @@ class Infobot(IRCHandler):
 
         self._send(f"MODE {chan}")
 
+        self.channels.append(chan)
         self.events.Join.fire(self, host, chan)
 
 
