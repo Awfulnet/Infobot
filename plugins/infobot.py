@@ -87,7 +87,7 @@ def rmalias(bot, nick, chan, _, arg):
         db.execute("SELECT delinfo(%s);", (nick,))
         bot.notice(nick, "Deleted info.")
 
-@command('append', r'^!$name(?:\s|$)', ppmsg=True)
+@command('append', r'^!$name(?:\s|$)', pass_privmsg=True)
 def appendinfo(bot, nick, chan, arg, pmsg):
     """ !append <info> -> Append <info> to your info. """
     if not arg:
@@ -104,7 +104,7 @@ def appendinfo(bot, nick, chan, arg, pmsg):
     db.execute("SELECT addinfo(%s, %s, %s, %s);", (alias, user, host, info))
     bot.notice(nick, "Info set to '%s'" % (info))
 
-@command('sql', '^&$name .+', admin=True)
+@command('sql', admin=True)
 def execsql(bot, nick, chan, arg):
     db.execute(arg)
     try:
@@ -112,7 +112,7 @@ def execsql(bot, nick, chan, arg):
     except:
        traceback.print_exc()
 
-@command('sed', '^!$name .+', ppmsg=True)
+@command('sed', '^!$name .+', pass_privmsg=True)
 def sedinfo(bot, nick, chan, arg, pmsg):
     # first, get the info for the current nick
     info = db.execute("SELECT nick, info FROM info(%s);", (nick,)).fetchone()

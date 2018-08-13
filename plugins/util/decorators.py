@@ -34,37 +34,37 @@ def process_privmsg(msg):
     msg = msg["arg"].split(":", 1)[1]
     return (nick, chan, msg)
 
-def command(name, regex, admin=False, ppmsg=False):
-    if type(regex) == type(''):
+def command(name, regex=None, cmdchar='&', admin=False, pass_privmsg=False):
+    if not regex:
+        regex = f'^{re.escape(cmdchar)}$name'
+
+    if isinstance(regex, str):
         regex = regex.replace('$name', name)
         regex = re.compile(regex)
+
     def decorator(funct):
         @wraps(funct)
-        def new_func(bot, pmsg):
-            nick, chan, msg = process_privmsg(pmsg)
-            m = regex.search(msg)
-            if ' ' in msg:
-                arg = msg.split(' ', 1)[1]
-            else:
-                arg = ""
-            if not m:
+        def new_func(bot, privmsg):
+            nick, chan, msg = process_privmsg(privmsg)
+
+            match = regex.search(msg)
+            arg = msg.split(' ', 1)[1] if ' ' in msg else ""
+
+            if not match:
                 return
 
-            if not bot.auth.isadmin(User.from_host(pmsg["host"])) and admin:
+            if admin and not bot.auth.isadmin(User.from_host(privmsg["host"])):
                 return
 
-            groups = m.groupdict() or m.groups()
+            groups = match.groupdict() or match.groups()
 
-            if groups:
-                if ppmsg:
-                    funct(bot, nick, chan, groups, arg, pmsg)
-                else:
-                    funct(bot, nick, chan, groups, arg)
-            else:
-                if ppmsg:
-                    funct(bot, nick, chan, arg, pmsg)
-                else:
-                    funct(bot, nick, chan, arg)
+            args = [bot, nick, chan]
+            if groups: args.append(groups)
+            args.append(arg)
+            if pass_privmsg: args.append(privmsg)
+
+            funct(*args)
+
         new_func.__core__ = False
         callback("PRIVMSG")(new_func)
         return new_func
