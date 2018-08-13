@@ -191,7 +191,7 @@ class Infobot(IRCHandler):
             if hasattr(plugin, "__inits__"):
                 for init in plugin.__inits__:
                     init(self)
-        logger.info("Loaded %d plugins (%s)", len(plugins), ' ⇒ '.join(plugin.__name__.rsplit('.',1)[1] for plugin in plugins))
+        logger.info("Loaded %d plugin(s) (%s)", len(plugins), ' ⇒ '.join(plugin.__name__.rsplit('.',1)[1] for plugin in plugins))
 
 
     @IRCCallback("332") # RPL_TOPIC
