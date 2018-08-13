@@ -37,7 +37,7 @@ except ImportError:
 
 libc = ctypes.CDLL("libc.so.6")
 
-VERSION = "2.0.0"
+VERSION = "2.0.0-alpha"
 
 LOGLEVEL = logging.INFO
 FORMAT = "[%(asctime)s %(msecs)3d] [%(levelname)7s] %(name)7s: %(message)s"
