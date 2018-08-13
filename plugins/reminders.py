@@ -4,7 +4,6 @@
 * depends: database
 """
 import parsedatetime
-import datetime
 import humanize
 import regex
 import threading
@@ -14,6 +13,7 @@ from pytz import timezone
 from .util.decorators import command, init, process_privmsg
 from .util.dict import CaseInsensitiveDefaultDict as CIDD
 from collections import namedtuple
+from datetime import datetime
 
 logger = logging.getLogger("remind")
 logger.setLevel(logging.DEBUG)
@@ -52,10 +52,12 @@ def add_tell(to_nick, tellid, from_nick, message, begints):
 
 def add_reminder(bot, *args):
     reminder = Reminder(*args)
-    delta = reminder.endts - datetime.datetime.utcnow()
-    if (delta.total_seconds() < 0):
+    current_time = datetime.utcnow()
+    if (current_time >= reminder.endts):
+        remind_handler(bot, reminder)
         return
 
+    delta = reminder.endts - datetime.utcnow()
     timer = threading.Timer(delta.total_seconds(), remind_handler, args=(bot, reminder))
     timer.start()
     timers.append(timer)
@@ -73,7 +75,7 @@ def db_get_reminders(bot):
         add_reminder(bot, *reminder)
 
 def send_tell(bot, nick, chan, tell):
-    timestring = humanize.naturaltime(datetime.datetime.utcnow() - tell.date)
+    timestring = humanize.naturaltime(datetime.utcnow() - tell.date)
 
     output = "{} {}: {} · {} · {}".format( # message indicator, to_nick, message, from, time
         bot.style.green("| ✉ |"),
@@ -92,8 +94,8 @@ def tell_handler(bot, nick, chan):
             send_tell(bot, nick, chan, tell)
         del tells[nick]
 
-def remind_handler(bot, reminder):
-    timestring = humanize.naturaltime(datetime.datetime.utcnow() - reminder.begints)
+def remind_handler(bot, reminder, late_time=None):
+    timestring = humanize.naturaltime(datetime.utcnow() - reminder.begints)
     output = "{} {}: {} · {} · {}".format(
         bot.style.green("| ✉ |"),
         bot.style.teal(reminder.to_nick),
@@ -127,13 +129,13 @@ def remind(bot, nick, chan, gr, arg):
         # this is a reminder, as it has an end time
         endts = calendar.parseDT(time, tzinfo=timezone("UTC"))[0]
         # UTCnow doesn't add a timezone attribute, so we have to add it ourselves
-        utcnow = datetime.datetime.utcnow().replace(tzinfo=timezone("UTC"))
+        utcnow = datetime.utcnow().replace(tzinfo=timezone("UTC"))
         delta = endts - utcnow
 
         reminderid = db.execute("INSERT INTO reminders (from_nick, to_nick, message, channel, endts) VALUES (%s,%s,%s,%s,%s) RETURNING id;",
                                 (nick, to_nick, message, chan, endts)).fetchone()[0]
 
-        reminder = Reminder(reminderid, to_nick, nick, message, chan, datetime.datetime.utcnow(), endts)
+        reminder = Reminder(reminderid, to_nick, nick, message, chan, datetime.utcnow(), endts)
 
         timer = threading.Timer(delta.total_seconds(), remind_handler, args=(bot, reminder))
         timer.start()
@@ -146,7 +148,7 @@ def remind(bot, nick, chan, gr, arg):
         tellid = db.execute("INSERT INTO tells (to_nick, from_nick, message) VALUES (%s,%s,%s) RETURNING tellid;",
                 (to_nick, nick, message)).fetchone()[0];
 
-        tells[to_nick].append(Tell(tellid, nick, message, datetime.datetime.utcnow()))
+        tells[to_nick].append(Tell(tellid, nick, message, datetime.utcnow()))
 
         bot.msg(chan, f"I'll tell {pronoun} that.")
 
@@ -155,6 +157,6 @@ def init(bot):
     global db
     db = bot.data["db"]
     db_get_tells()
-    db_get_reminders(bot)
+    bot.events.Welcome.register(lambda: db_get_reminders(bot))
 
     bot.events.Join.register(lambda bot, host, channel: tell_handler(bot, host.split('!')[0], channel))
