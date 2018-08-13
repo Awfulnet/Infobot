@@ -92,6 +92,11 @@ def cmd_quit(bot, nick, chan, groups, arg):
         bot._send("QUIT :bye")
     bot.gracefully_terminate()
 
+@command('plugins', cmdchar='&', admin=True)
+def cmd_plugins(bot, nick, chan, arg):
+    bot.msg(chan, "Loaded plugins: " +
+            ', '.join(plug.__name__.split('.')[1] for plug in bot.plugins))
+
 @command('eval', r'^>> ', admin=True)
 def cmd_eval(bot, nick, chan, arg):
     """ eval *args -> Evaluate *args as python code."""

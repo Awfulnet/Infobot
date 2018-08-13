@@ -175,7 +175,7 @@ class Infobot(IRCHandler):
         pluginLoader = PluginLoader(blacklist=self.blacklisted_plugins)
 
         try:
-            plugins = pluginLoader.load_all()
+            self.plugins = plugins = pluginLoader.load_all()
         except DependencyError as e:
             logger.error(f"Dependency error: {e}")
             exit(EXIT_FAILURE)
