@@ -8,8 +8,9 @@ Usage: infobot.py [options]
        infobot.py --version
 
 Options:
-    --debug, -d     Sets logging level to DEBUG
-    --raw, -r       Show raw protocol traffic
+    --debug, -d                 Sets logging level to DEBUG
+    --raw, -r                   Show raw protocol traffic
+    --disable-plugins <plugins> Disable plugins, comma-separated.
 """
 from core import DotDict
 from core.irc import IRCHandler
@@ -18,7 +19,7 @@ from core.events import Event
 from core.events import Standard as StandardEvents
 from core.decorators import IRCCallback
 from core.style import Styler
-from core.plugins import PluginLoader
+from core.plugins import PluginLoader, DependencyError
 
 import json
 import re
@@ -41,6 +42,8 @@ VERSION = "2.0.0"
 LOGLEVEL = logging.INFO
 FORMAT = "[%(asctime)s %(msecs)3d] [%(levelname)7s] %(name)7s: %(message)s"
 
+EXIT_FAILURE = 1
+
 import coloredlogs
 
 class Infobot(IRCHandler):
@@ -55,6 +58,7 @@ class Infobot(IRCHandler):
         self.style = Styler()
         self.config = config
         self.nick = config["nick"]
+        self.blacklisted_plugins = (args['--disable-plugins'] or '').split(',')
 
         # Arbitrary bot data
         self.data = {"topics": {}}
@@ -169,8 +173,14 @@ class Infobot(IRCHandler):
         root.addHandler(sh)
 
     def register_plugins(self):
-        pluginLoader = PluginLoader()
-        plugins = pluginLoader.load_all()
+        pluginLoader = PluginLoader(blacklist=self.blacklisted_plugins)
+
+        try:
+            plugins = pluginLoader.load_all()
+        except DependencyError as e:
+            logger.error(f"Dependency error: {e}")
+            exit(EXIT_FAILURE)
+
         for plugin in plugins:
             if hasattr(plugin, "__callbacks__"):
                 for k, v in plugin.__callbacks__.items():

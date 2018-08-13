@@ -17,17 +17,19 @@ class PluginLoader(object):
     Generates a dependency graph and returns a list of loaded modules when
     load_all() is called.
     """
-    def __init__(self, plugin_directory="plugins"):
+    def __init__(self, plugin_directory="plugins", blacklist=None):
         """ Initializes the PluginLoader by generating a dependency graph """
         self.plugin_package = self.plugin_directory = plugin_directory
         self.graph = {}
+        self.blacklist = set(blacklist) if blacklist else set()
 
         path = Path(self.plugin_directory)
         plugin_paths = []
         for subpath in path.iterdir():
             if (subpath.is_dir() and (subpath / '__init__.py').exists()) or \
                (subpath.name.endswith('.py')):
-                plugin_paths.append(subpath)
+                if subpath.stem not in self.blacklist:
+                    plugin_paths.append(subpath)
 
         for path in plugin_paths:
             self.parseDepends(path)
@@ -55,7 +57,17 @@ class PluginLoader(object):
         plugin = importlib.import_module(name)
         return plugin
 
+    def check_impossible_loads(self):
+        for plugin, deps in self.graph.items():
+            blacklisted_deps = set(deps) & self.blacklist
+            if blacklisted_deps:
+                verb_form = "are" if len(blacklisted_deps) > 1 else "is"
+                raise DependencyError(f"Plugin {plugin.stem} requires {', '.join(deps)},"
+                                      f" which {verb_form} blacklisted.")
+
     def load_all(self):
+        self.check_impossible_loads()
+
         plugins = []
         self.load_plugin('__init__.py', name='plugins')
         while (self.graph):
@@ -74,3 +86,6 @@ class PluginLoader(object):
                         pass
 
         return plugins
+
+class DependencyError(Exception):
+    pass
