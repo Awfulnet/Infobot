@@ -46,13 +46,6 @@ REMIND_TELL_RE = regex.compile(r"""^
         )""",
         regex.X | regex.V1)
 
-@init
-def init(bot):
-    global db
-    db = bot.data["db"]
-    db_get_tells()
-    db_get_reminders(bot)
-
 def add_tell(to_nick, tellid, from_nick, message, begints):
     tells[to_nick].append(
         Tell(tellid, from_nick, message, begints))
@@ -116,9 +109,6 @@ def remind_handler(bot, reminder):
 __callbacks__ = {
     "PRIVMSG": [
         lambda b,m: tell_handler(b, *process_privmsg(m)[:2])
-    ],
-    "JOIN": [
-        lambda b,m: tell_handler(b, m["host"].split('!')[0], m["arg"][1:])
     ]}
 
 @command('remind', REMIND_TELL_RE)
@@ -159,3 +149,12 @@ def remind(bot, nick, chan, gr, arg):
         tells[to_nick].append(Tell(tellid, nick, message, datetime.datetime.utcnow()))
 
         bot.msg(chan, f"I'll tell {pronoun} that.")
+
+@init
+def init(bot):
+    global db
+    db = bot.data["db"]
+    db_get_tells()
+    db_get_reminders(bot)
+
+    bot.events.Join.register(lambda bot, host, channel: tell_handler(bot, host.split('!')[0], channel))
