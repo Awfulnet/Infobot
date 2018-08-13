@@ -129,6 +129,8 @@ def remind(bot, nick, chan, gr, arg):
     if (to_nick == 'me'):
         to_nick = nick
 
+    pronoun = 'them' if to_nick != nick else "you"
+
     to_nick = to_nick.strip('@')
 
     if (time is not None):
@@ -148,7 +150,7 @@ def remind(bot, nick, chan, gr, arg):
         timers.append(timer)
 
         reminders[to_nick].append(reminder)
-        bot.msg(chan, "I'll remind them.")
+        bot.msg(chan, f"I'll remind {pronoun}.")
     else:
         # this is a tell
         tellid = db.execute("INSERT INTO tells (to_nick, from_nick, message) VALUES (%s,%s,%s) RETURNING tellid;",
@@ -156,4 +158,4 @@ def remind(bot, nick, chan, gr, arg):
 
         tells[to_nick].append(Tell(tellid, nick, message, datetime.datetime.utcnow()))
 
-        bot.msg(chan, "I'll tell them that.")
+        bot.msg(chan, f"I'll tell {pronoun} that.")
