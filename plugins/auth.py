@@ -91,6 +91,9 @@ class Authenticator(object):
         bot.auth = self
         self.bot = bot
 
+        for admin in bot.config.get("admins", []):
+            self.addadmin(*admin)
+
 auth = Authenticator()
 
 __inits__ = [auth.init]

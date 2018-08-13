@@ -80,9 +80,6 @@ class Infobot(IRCHandler):
 
         self.server_supports = DotDict()
 
-        for item in self.config["admins"]:
-            self.auth.addadmin(item[0], item[1], item[2])
-
     def __repr__(self):
         return "Infobot(server=%r)" % (self.config["server"].split(':')[0])
 
