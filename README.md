@@ -16,5 +16,6 @@ While being backward compatible it has many new features and upgrades including,
 This allows everyone to to point out any bugs or submit changes, continuously making Infobot better.
 
 ## Extra features
+* **Reminders** - Remind something to yourself or someone else after specified time or whenever they come online.
 * **Bots' command character management** - Keep a registry of bots, their owners and the command characters they use.
 * **Automatic link shortening** - Infobot automatically shortens links longer than 90 characters if a bit.ly API account is provided.
