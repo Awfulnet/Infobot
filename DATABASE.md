@@ -8,13 +8,13 @@ Connecting
 ----------
 For whichever reason you wish to use the database you need a PostgreSQL tool or a suitable library in your programming language. The publically readable access details are the following:
 
-* Host: `tehsvk.net`
+* Host: `segfault.party`
 * Port: `5432` (default)
 * Username: `readonly`
 * Password: `readonly`
 * Database: `infobot`
 
-Some PostgreSQL libraries also take a connection string: `postgres://readonly:readonly@tehsvk.net/infobot`.
+Some PostgreSQL libraries also take a connection string: `postgres://readonly:readonly@segfault.party/infobot`.
 
 Usage
 -----
