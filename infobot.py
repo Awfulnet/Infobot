@@ -255,6 +255,11 @@ class Infobot(IRCHandler):
         channel = msg["arg"].split()[1]
         self.events.NamesEnd.fire(self, channel)
 
+    @IRCCallback("QUIT")
+    def _quit(self, msg):
+        user = msg["host"]
+        self.events.Quit.fire(self, user)
+
     @IRCCallback("JOIN")
     def join(self, msg):
         chan = msg["arg"][1:]

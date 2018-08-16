@@ -1,7 +1,8 @@
 import traceback
 
 Standard = ("Welcome", "Mode", "Join", "Part", "Names", "NamesEnd", "Message",
-            "Notice", "Shutdown", "Kick", "CommandCalled", "ChannelMode")
+            "Notice", "Shutdown", "Kick", "CommandCalled", "ChannelMode",
+            "Quit")
 
 class HandlerSet(set):
     def __getattribute__(self, name):
