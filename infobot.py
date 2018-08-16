@@ -49,7 +49,10 @@ import coloredlogs
 class Infobot(IRCHandler):
     """ Infobot main class """
     def __init__(self, config, args):
+        global logger
         self.register_logger()
+
+        logger = logging.getLogger("infobot")
 
         logger.info("Infobot version %s", VERSION)
         logger.info("© 2014-2018 Sam van Kampen, Simmo Saan and contributors")
@@ -156,7 +159,8 @@ class Infobot(IRCHandler):
         logger.info("*%s* %s", msg["host"], msg["arg"].split(" ", 1)[1][1:])
 
     def register_logger(self):
-        root = logging.getLogger()
+        fh = logging.FileHandler('infobot.log')
+        fh.setLevel(LOGLEVEL)
 
         sh = logging.StreamHandler()
         sh.setLevel(LOGLEVEL)
@@ -169,7 +173,10 @@ class Infobot(IRCHandler):
             "asctime": {"color": "cyan"}
         })
         sh.setFormatter(formatter)
-        root.addHandler(sh)
+
+        fh.setFormatter(formatter)
+
+        logging.basicConfig(handlers=[sh, fh], level=LOGLEVEL)
 
     def register_plugins(self):
         pluginLoader = PluginLoader(blacklist=self.blacklisted_plugins)
@@ -286,12 +293,11 @@ if __name__ == "__main__":
         DEBUG = debug
         LOGLEVEL = logging.DEBUG
 
-    logging.basicConfig(filename="infobot.log", level=LOGLEVEL)
-    logger = logging.getLogger("infobot")
 
     config = json.load(open("config.json", "r"))
     bot = Infobot(config, args)
     bot.connect()
+
 
     if (sdnotify):
         # Notify systemd that the service startup is complete.
