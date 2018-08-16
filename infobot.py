@@ -288,7 +288,7 @@ class Infobot(IRCHandler):
         self.events.Quit.fire(self, user)
 
     @IRCCallback("JOIN")
-    def join(self, msg):
+    def _join(self, msg):
         chan = msg["arg"][1:]
         host = msg["host"]
 
