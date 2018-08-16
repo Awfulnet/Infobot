@@ -126,7 +126,10 @@ class Infobot(IRCHandler):
         if not msg["arg"].startswith("#"):
             self.nick = msg["arg"].split(" ", 1)[0]
 
-        self.events.Mode.fire(msg)
+        user = msg["host"]
+        target, modestring, *modeargs = msg["args"]
+
+        self.events.Mode.fire(bot, user, target, modestring, modeargs)
 
     @IRCCallback("324") # RPL_CHANNELMODEIS
     def channel_mode(self, msg):
