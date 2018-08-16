@@ -103,7 +103,7 @@ class Infobot(IRCHandler):
 
     @IRCCallback("005") # RPL_ISUPPORT
     def isupport(self, msg):
-        opts = msg["args"][:-1] # skip :are supported by this server
+        opts = msg["args"][1:-1] # skip client and :are supported by this server
         for opt in opts:
             if '=' in opt:
                 k, v = opt.split('=')
