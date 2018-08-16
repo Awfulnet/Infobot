@@ -270,6 +270,18 @@ class Infobot(IRCHandler):
         channel = msg["arg"].split()[1]
         self.events.NamesEnd.fire(self, channel)
 
+    @IRCCallback("PART")
+    def _part(self, msg):
+        user = msg["host"]
+        channel, reason = msg["args"]
+        self.events.Part.fire(self, user, channel, reason)
+
+    @IRCCallback("KICK")
+    def _kick(self, msg):
+        channel, kicked, reason = msg["args"]
+        kicker = msg["host"]
+        self.events.Kick.fire(self, kicker, kicked, channel, reason)
+
     @IRCCallback("QUIT")
     def _quit(self, msg):
         user = msg["host"]
