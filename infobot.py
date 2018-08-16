@@ -20,6 +20,7 @@ from core.events import Standard as StandardEvents
 from core.decorators import IRCCallback
 from core.style import Styler
 from core.plugins import PluginLoader, DependencyError
+from core.logging import TagSupportFilter
 
 import json
 import re
@@ -40,7 +41,7 @@ libc = ctypes.CDLL("libc.so.6")
 VERSION = "2.0.0-alpha"
 
 LOGLEVEL = logging.INFO
-FORMAT = "[%(asctime)s %(msecs)3d] [%(levelname)7s] %(name)7s: %(message)s"
+FORMAT = "[%(asctime)s %(msecs)3d] [%(levelname)7s] %(name)7s: %(message)s %(tag)s"
 
 EXIT_FAILURE = 1
 
@@ -170,10 +171,14 @@ class Infobot(IRCHandler):
             "programname": {"color": "cyan"},
             "name": {"color": "red"},
             "levelname": {"color": "magenta"},
-            "asctime": {"color": "cyan"}
+            "asctime": {"color": "cyan"},
+            "tag": {"color": "blue"}
         })
+
+        sh.addFilter(TagSupportFilter())
         sh.setFormatter(formatter)
 
+        fh.addFilter(TagSupportFilter())
         fh.setFormatter(formatter)
 
         logging.basicConfig(handlers=[sh, fh], level=LOGLEVEL)
