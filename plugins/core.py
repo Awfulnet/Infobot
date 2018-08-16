@@ -26,8 +26,7 @@ class IRCterpreter(code.InteractiveConsole):
         if not match:
             return traceback
         exc_name, exc_args = match.groups()
-        out = "⌜ \x02\x03such \x034%s \x03so \x034%s\x03\x02 ⌟" % (
-            exc_name, exc_args)
+        out = "\x02\x034%s: %s\x03\x02" % (exc_name, exc_args)
         return out
 
 
@@ -36,7 +35,6 @@ class IRCterpreter(code.InteractiveConsole):
 
         if self.is_exception(out):
             # most likely a traceback, only capture exception
-            print(out)
             out = self.guru_meditate(out.rsplit("\n", 1)[1])
 
         if len(out) > 0:
@@ -51,9 +49,10 @@ class IRCterpreter(code.InteractiveConsole):
         self.locals["nick"] = nick
         self.curnick = nick
         self.curchan = chan
-        sys.stdout = sys.interp = self
+        sys.stdout = sys.stderr = self
         self.push(code)
         sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         self.flushbuf()
 
 @init
