@@ -46,7 +46,7 @@ class PluginLoader(object):
         with open(main_file) as plugin:
             for line in plugin:
                 if '* noload' in line:
-                    logger.info(f"Not loading plugin {path.stem}"
+                    logger.info(f"Not loading plugin {path.stem} "
                                  "due to noload directive")
                     return
 
