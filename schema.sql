@@ -270,7 +270,7 @@ CREATE VIEW public.aliasinfos AS
                    FROM public.infos infos_1
                   WHERE (NOT (EXISTS ( SELECT NULL::text AS unknown
                            FROM public.aliases
-                          WHERE (lower((aliases.nick)::text) = lower((aliases.nick)::text)))))) m
+                          WHERE (lower((aliases.nick)::text) = lower(infos_1.nick)))))) m
           GROUP BY m.alias) a,
     public.infos
   WHERE (infos.id = ( SELECT public.infoid2(a.alias) AS infoid2));
