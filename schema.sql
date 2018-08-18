@@ -150,9 +150,9 @@ SET default_with_oids = false;
 
 CREATE TABLE public.infos (
     id integer NOT NULL,
-    nick character varying(64) NOT NULL,
-    "user" character varying(64),
-    host character varying(64),
+    nick text NOT NULL,
+    "user" text,
+    host text,
     info text,
     ts timestamp without time zone DEFAULT timezone('utc'::text, now())
 );
@@ -346,7 +346,7 @@ CREATE VIEW public.latestinfos AS
     infos.info,
     infos.ts
    FROM public.infos
-  WHERE (infos.ts = ( SELECT public.latesttimestamp(infos.nick) AS latesttimestamp));
+  WHERE (infos.ts = ( SELECT public.latesttimestamp((infos.nick)::character varying) AS latesttimestamp));
 
 
 ALTER TABLE public.latestinfos OWNER TO infobot;
