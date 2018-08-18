@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.3 (Ubuntu 10.3-1)
--- Dumped by pg_dump version 10.3 (Ubuntu 10.3-1)
+-- Dumped from database version 10.5 (Ubuntu 10.5-0ubuntu0.18.04)
+-- Dumped by pg_dump version 10.5 (Ubuntu 10.5-0ubuntu0.18.04)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -73,7 +73,7 @@ ALTER FUNCTION public.addinfo(nick_ character varying, user_ character varying, 
 --
 
 CREATE FUNCTION public.alias(nick_ character varying) RETURNS character varying
-    LANGUAGE sql
+    LANGUAGE sql STABLE
     AS $$
 SELECT nick FROM aliaschain(nick_) ORDER BY i DESC LIMIT 1;
 $$;
@@ -86,7 +86,7 @@ ALTER FUNCTION public.alias(nick_ character varying) OWNER TO infobot;
 --
 
 CREATE FUNCTION public.aliaschain(nick_ character varying) RETURNS TABLE(i integer, nick character varying)
-    LANGUAGE sql ROWS 2
+    LANGUAGE sql STABLE ROWS 2
     AS $$
 WITH RECURSIVE chain(i, nick) AS (
     VALUES (0, nick_)
@@ -165,7 +165,7 @@ ALTER TABLE public.infos OWNER TO infobot;
 --
 
 CREATE FUNCTION public.info(nick_ character varying) RETURNS SETOF public.infos
-    LANGUAGE sql ROWS 1
+    LANGUAGE sql STABLE ROWS 1
     AS $$
 SELECT * FROM infos WHERE id = (SELECT infoid(nick_));
 $$;
@@ -191,7 +191,7 @@ ALTER FUNCTION public.infohistory(nick_ character varying) OWNER TO infobot;
 --
 
 CREATE FUNCTION public.infoid(nick_ character varying) RETURNS integer
-    LANGUAGE sql
+    LANGUAGE sql STABLE
     AS $$
 SELECT id FROM infos WHERE lower(nick) = lower(alias(nick_)) ORDER BY ts DESC LIMIT 1;
 $$;
@@ -501,6 +501,20 @@ ALTER TABLE ONLY public.reminders
 
 ALTER TABLE ONLY public.tells
     ADD CONSTRAINT tells_pkey PRIMARY KEY (tellid);
+
+
+--
+-- Name: info_nick_index; Type: INDEX; Schema: public; Owner: infobot
+--
+
+CREATE INDEX info_nick_index ON public.infos USING btree (nick);
+
+
+--
+-- Name: infos_lower_nick_ts_desc_index; Type: INDEX; Schema: public; Owner: infobot
+--
+
+CREATE INDEX infos_lower_nick_ts_desc_index ON public.infos USING btree (lower(nick), ts DESC);
 
 
 --
