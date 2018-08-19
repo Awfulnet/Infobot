@@ -2,7 +2,6 @@ from .util.decorators import init, command
 from .util.data import sugar, lineify
 
 import code
-import datetime
 import sys
 import re
 
@@ -63,13 +62,11 @@ def init(bot):
                                       "os": __import__("os")})
     bot.data["interp_locals"]['_dir'] = lambda x: [i for i in dir(x) if not i.startswith("__")]
 
-@command('say', r'^&$name .+')
+@command('say', r'^&$name .+', auth=True)
 def cmd_say(bot, nick, chan, arg):
-    if bot.verbose:
-        print(datetime.datetime.utcnow())
+    if ' ' in arg and arg.startswith('#'):
+        chan, arg = arg.split(' ', 1)
     bot._msg(chan, arg)
-
-cmd_say.__core__ = True #haxx
 
 @command('raw', r'^&$name .+', admin=True)
 def cmd_raw(bot, nick, chan, arg):

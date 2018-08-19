@@ -2,6 +2,10 @@ from plugins.auth import User
 from inspect import getmodule
 from functools import wraps
 import re
+import logging
+import traceback
+
+logger = logging.getLogger("util")
 
 def init(funct):
     m = getmodule(funct)
@@ -34,7 +38,20 @@ def process_privmsg(msg):
     msg = msg["arg"].split(":", 1)[1]
     return (nick, chan, msg)
 
-def command(name, regex=None, cmdchar='&', admin=False, pass_privmsg=False):
+def try_auth_ng_import():
+    global AUTH_NG, Action, AuthRes
+    try:
+        from plugins.auth_ng.data import Action, AuthRes
+        AUTH_NG = True
+    except Exception:
+        traceback.print_exc()
+        logger.warn("Missing auth_ng plugin, so tag-based auth won't work.")
+        AUTH_NG = False
+
+def command(name, regex=None, cmdchar='&', admin=False, pass_privmsg=False, auth=False):
+    if auth:
+        try_auth_ng_import()
+
     if not regex:
         regex = f'^{re.escape(cmdchar)}$name'
 
@@ -53,8 +70,17 @@ def command(name, regex=None, cmdchar='&', admin=False, pass_privmsg=False):
             if not match:
                 return
 
+            if auth and not AUTH_NG:
+                return
+
+            if auth:
+                res = bot.authmgr.try_auth(Action.COMMAND_CALL, new_func, privmsg["host"])
+                if res == AuthRes.FAIL:
+                    return
+
             if admin and not bot.auth.isadmin(User.from_host(privmsg["host"])):
                 return
+
 
             groups = match.groupdict() or match.groups()
 

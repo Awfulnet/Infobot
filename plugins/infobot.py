@@ -1,7 +1,7 @@
 """
 Info functionality
 
-* depends: database
+* depends: database, auth_ng
 """
 from .util.decorators import command, init, process_privmsg
 from .sed import Substitution
@@ -104,7 +104,7 @@ def appendinfo(bot, nick, chan, arg, pmsg):
     db.execute("SELECT addinfo(%s, %s, %s, %s);", (alias, user, host, info))
     bot.notice(nick, "Info set to '%s'" % (info))
 
-@command('sql', admin=True)
+@command('sql', auth=True)
 def execsql(bot, nick, chan, arg):
     db.execute(arg)
     try:
