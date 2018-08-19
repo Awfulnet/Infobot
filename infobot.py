@@ -278,7 +278,11 @@ class Infobot(IRCHandler):
 
     @IRCCallback("KICK")
     def _kick(self, msg):
-        channel, kicked, reason = msg["args"]
+        channel, kicked, *rest = msg["args"]
+        if rest:
+            reason = rest[0]
+        else:
+            reason = ""
         kicker = msg["host"]
         self.events.Kick.fire(self, kicker, kicked, channel, reason)
 
