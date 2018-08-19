@@ -69,7 +69,7 @@ def getinfo(bot, nick, chan, gr, arg):
 
     if info[0].lower() == arg.lower():
         return msgfn("%s: %s" % (arg, info[1]))
-    msgfn("%s →  %s: %s" % (arg, info[0], info[1]))
+    msgfn("%s → %s: %s" % (arg, info[0], info[1]))
 
 @command('del|rm', r'^!($name)(\s|$)')
 def rmalias(bot, nick, chan, _, arg):
