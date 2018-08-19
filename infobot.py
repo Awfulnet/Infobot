@@ -287,6 +287,11 @@ class Infobot(IRCHandler):
         user = msg["host"]
         self.events.Quit.fire(self, user)
 
+    def get_cmd(self, name):
+        for handler in self.__irccallbacks__['PRIVMSG']:
+            if hasattr(handler, "cmd_name") and handler.cmd_name == name:
+                return handler
+
     @IRCCallback("JOIN")
     def _join(self, msg):
         chan = msg["arg"][1:]

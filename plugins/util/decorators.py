@@ -66,6 +66,7 @@ def command(name, regex=None, cmdchar='&', admin=False, pass_privmsg=False):
             funct(*args)
 
         new_func.__core__ = False
+        new_func.cmd_name = name
         callback("PRIVMSG")(new_func)
         return new_func
     return decorator
