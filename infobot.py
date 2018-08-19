@@ -116,9 +116,11 @@ class Infobot(IRCHandler):
         self._send("JOIN :" + pmsg["arg"].split(":")[1])
 
     def switch(self):
+        logger.debug("Releasing lock")
         self.lock.release()
         libc.sched_yield()
         self.lock.acquire()
+        logger.debug("Acquired lock")
 
     @IRCCallback("MODE")
     def mode(self, msg):

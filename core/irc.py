@@ -61,7 +61,7 @@ class IRCHandler(object):
                 if data == '':
                     self.running = False
                 if self.print_raw:
-                    print(data.strip())
+                    logger.debug(data.strip())
                 self.buff.append(data)
 
                 self.handle_messages()
@@ -74,7 +74,7 @@ class IRCHandler(object):
         self.outbuff.append(data+newline)
         for msg in self.outbuff:
             if self.print_raw:
-                print(msg.strip())
+                logger.debug(msg.strip())
             self.sock.sendall((msg+newline).encode("utf-8"))
 
     def run_callback(self, cname, *args):
