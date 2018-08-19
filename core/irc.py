@@ -78,7 +78,6 @@ class IRCHandler(object):
             self.sock.sendall((msg+newline).encode("utf-8"))
 
     def run_callback(self, cname, *args):
-        noncore = False
         funcs = self.__irccallbacks__.get(cname, None)
         __core__ = None
         if not funcs:
@@ -93,9 +92,7 @@ class IRCHandler(object):
                     func(*args)
                 else:
                     func(self, *args)
-            else:
-                noncore = True
-        if noncore:
+        if not __core__:
             self.cmd_thread.push(cname, args)
             self.switch()
 
