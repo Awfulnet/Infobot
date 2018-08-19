@@ -142,7 +142,7 @@ def remind(bot, nick, chan, gr, arg):
         timers.append(timer)
 
         reminders[to_nick].append(reminder)
-        bot.msg(chan, f"I'll remind {pronoun}.")
+        bot.msg(chan, f"I'll remind {pronoun} in {delta}.")
     else:
         # this is a tell
         tellid = db.execute("INSERT INTO tells (to_nick, from_nick, message) VALUES (%s,%s,%s) RETURNING tellid;",
