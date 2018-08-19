@@ -5,7 +5,7 @@ Infobot auth-ng
 from collections import defaultdict
 from . import tags
 from .tags import Tag
-from .data import NUH, Action, AuthRes
+from .data import NUH, Action, AuthRes, TagTypeError
 from ..util.decorators import init
 from typing import List
 
@@ -58,12 +58,6 @@ class Authenticator:
                 return AuthRes.FAIL
 
         return AuthRes.FAIL
-
-class AuthenticationError(Exception):
-    pass
-
-class TagTypeError(AuthenticationError):
-    pass
 
 @init
 def plugin_init(bot):

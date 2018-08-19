@@ -5,6 +5,12 @@ import re
 Action = Enum('Action', ('COMMAND_CALL',))
 AuthRes = Enum('AuthRes', ('FAIL', 'CONTINUE', 'SUCCESS'))
 
+class AuthenticationError(Exception):
+    pass
+
+class TagTypeError(AuthenticationError):
+    pass
+
 @dataclass(frozen=True)
 class NUH:
     nick: str

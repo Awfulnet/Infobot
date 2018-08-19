@@ -9,6 +9,9 @@ class User:
     host: str
     all_channels: dict
 
+    def __str__(self):
+        return repr(self)
+
     def __repr__(self):
         return f"{self.nick}!{self.user}@{self.host}"
 

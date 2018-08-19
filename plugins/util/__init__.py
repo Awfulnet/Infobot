@@ -8,6 +8,9 @@ import sys
 from collections import defaultdict
 from functools import reduce
 
+def exc_line(exception):
+    return f"\x02\x034{type(exception).__name__}: {exception}\x03\x02"
+
 def _merge_listdict_single(acc, x):
     """ Merges two dictionaries which contain lists.
         Initial value (acc) needs to be a defaultdict. """
