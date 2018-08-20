@@ -71,7 +71,7 @@ def getinfohist(bot, nick, chan, gr, arg):
     for n, item in list(enumerate(info))[::-1][int(arg):int(arg)+6]:
         bot.notice(nick, "#%d: %s →  %s: %s" % (n, arg, item[0], item[1]))
 
-@command('inforestore', '^!$name(?:\s|$)', ppmsg=True)
+@command('inforestore', '^!$name(?:\s|$)', pass_privmsg=True)
 def inforestore(bot, nick, chan, arg, pmsg):
     """!inforestore <n> -> set your info to a previous info. """
     try:
