@@ -68,7 +68,7 @@ def cmd_say(bot, nick, chan, arg):
         chan, arg = arg.split(' ', 1)
     bot._msg(chan, arg)
 
-@command('raw', r'^&$name .+', admin=True)
+@command('raw', r'^&$name .+', auth=True)
 def cmd_raw(bot, nick, chan, arg):
     bot._send(arg)
 
@@ -80,7 +80,7 @@ def cmd_join(bot, nick, chan, arg):
 def cmd_part(bot, nick, chan, arg):
     bot._send("PART :%s" % (chan))
 
-@command('quit', r'^&$name\s?(.+)?', admin=True)
+@command('quit', r'^&$name\s?(.+)?', auth=True)
 def cmd_quit(bot, nick, chan, groups, arg):
     if groups[0] is not None:
         bot._send("QUIT :%s" % (groups[0]))
@@ -88,12 +88,12 @@ def cmd_quit(bot, nick, chan, groups, arg):
         bot._send("QUIT :bye")
     bot.gracefully_terminate()
 
-@command('plugins', cmdchar='&', admin=True)
+@command('plugins', cmdchar='&', auth=True)
 def cmd_plugins(bot, nick, chan, arg):
     bot.msg(chan, "Loaded plugins: " +
             ', '.join(plug.__name__.split('.')[1] for plug in bot.plugins))
 
-@command('eval', r'^>> ', admin=True)
+@command('eval', r'^>> ', auth=True)
 def cmd_eval(bot, nick, chan, arg):
     """ eval *args -> Evaluate *args as python code."""
     arg = sugar(arg)
