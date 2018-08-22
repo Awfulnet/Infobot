@@ -6,10 +6,12 @@ import collections
 import sys
 from .buffer import Buffer
 from . import parse
+from .threads import HandlerThread
 import socket
 import types
 import inspect
 import logging
+import threading
 
 logger = logging.getLogger("irc")
 
@@ -28,8 +30,17 @@ class IRCHandler(object):
         self.outbuff = Buffer()
         self.is_welcome = False
 
+        self.lock = threading.Lock()
+
+        self.cmd_thread = HandlerThread(self, self.lock)
+        self.cmd_thread.daemon = True
+
+        self.lock.acquire()
+
     def connect(self):
         """ Connect to the IRC server """
+        self.cmd_thread.start()
+
         server = CONFIG["server"].split("|")[0].split(":")
         self.sock.connect((server[0], int(server[1])))
         try:

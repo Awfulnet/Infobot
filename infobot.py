@@ -14,7 +14,6 @@ Options:
 """
 from core import DotDict
 from core.irc import IRCHandler
-from core.threads import HandlerThread
 from core.events import Event
 from core.events import Standard as StandardEvents
 from core.decorators import IRCCallback
@@ -24,7 +23,6 @@ from core.logging import TagSupportFilter
 
 import json
 import re
-import threading
 import ssl
 import logging
 import ctypes
@@ -72,13 +70,8 @@ class Infobot(IRCHandler):
 
         self.channels = []
 
-        self.lock = threading.Lock()
-        self.lock.acquire()
-
         self.events = DotDict({name:Event(name) for name in StandardEvents})
 
-        self.cmd_thread = HandlerThread(self, self.lock)
-        self.cmd_thread.daemon = True
         self.register_callbacks()
         self.register_plugins()
 
@@ -140,7 +133,6 @@ class Infobot(IRCHandler):
         self.events.ChannelMode.fire(self, channel, modestring[1:], modeargs)
 
     def connect(self):
-        self.cmd_thread.start()
         if self.config["ssl"]:
             self.sock = ssl.wrap_socket(self.sock)
         super().connect()
