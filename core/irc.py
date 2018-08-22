@@ -30,16 +30,19 @@ class IRCHandler(object):
         self.outbuff = Buffer()
         self.is_welcome = False
 
-        self.lock = threading.Lock()
+        self.cond = threading.Condition(threading.Lock())
 
-        self.cmd_thread = HandlerThread(self, self.lock)
+        self.cmd_thread = HandlerThread(self, self.cond)
         self.cmd_thread.daemon = True
 
-        self.lock.acquire()
+        self.cond.acquire()
 
     def connect(self):
         """ Connect to the IRC server """
         self.cmd_thread.start()
+        logger.debug("Waiting for handler thread...")
+        self.cond.wait()
+        logger.debug("Handler thread sent notify.")
 
         server = CONFIG["server"].split("|")[0].split(":")
         self.sock.connect((server[0], int(server[1])))
@@ -106,6 +109,13 @@ class IRCHandler(object):
         if not __core__:
             self.cmd_thread.push(cname, args)
             self.switch()
+
+    def switch(self):
+        logger.debug("Calling notify")
+        self.cond.notify()
+        logger.debug("Calling wait")
+        self.cond.wait()
+        logger.debug("Wait over")
 
     def senduser(self):
         """ Send the IRC USER message. """
