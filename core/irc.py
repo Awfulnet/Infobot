@@ -94,18 +94,18 @@ class IRCHandler(object):
     def run_callback(self, cname, *args):
         funcs = self.__irccallbacks__.get(cname, None)
         __core__ = None
+
         if not funcs:
             return
+
         for func in funcs:
-            if not hasattr(func, "__core__"):
-                __core__ = False
-            else:
-                __core__ = getattr(func, "__core__")
+            __core__ = getattr(func, "__core__", False)
             if __core__:
                 if type(func) == types.MethodType:
                     func(*args)
                 else:
                     func(self, *args)
+
         if not __core__:
             self.cmd_thread.push(cname, args)
             self.switch()
