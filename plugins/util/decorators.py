@@ -45,7 +45,7 @@ def try_auth_ng_import():
     try:
         from plugins.auth_ng.data import Action, AuthRes
         AUTH_NG = True
-    except Exception:
+    except ImportError:
         traceback.print_exc()
         logger.warn("Missing auth_ng plugin, so tag-based auth won't work.")
         AUTH_NG = False
