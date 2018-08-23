@@ -29,8 +29,10 @@ class HandlerThread(threading.Thread):
         while True:
             try:
                 self.handle_commands()
-            except (SystemExit,KeyboardInterrupt):
-                    traceback.print_exc()
+            except (SystemExit, KeyboardInterrupt):
+                raise
+            except:
+                traceback.print_exc()
 
     def handle_commands(self):
         self.logger.debug("Calling wait")
