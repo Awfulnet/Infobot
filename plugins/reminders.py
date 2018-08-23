@@ -12,6 +12,7 @@ import logging
 from pytz import timezone
 from .util.decorators import command, init, process_privmsg
 from .util.dict import CaseInsensitiveDefaultDict as CIDD
+from .util.data import CommandException
 from collections import namedtuple
 from datetime import datetime
 
@@ -59,6 +60,7 @@ def add_reminder(bot, *args):
 
     delta = reminder.endts - datetime.utcnow()
     timer = threading.Timer(delta.total_seconds(), remind_handler, args=(bot, reminder))
+    timer.reminder = reminder
     timer.start()
     timers.append(timer)
     reminders[reminder.to_nick].append(reminder)
@@ -135,14 +137,9 @@ def remind(bot, nick, chan, gr, arg):
         reminderid = db.execute("INSERT INTO reminders (from_nick, to_nick, message, channel, endts) VALUES (%s,%s,%s,%s,%s) RETURNING id;",
                                 (nick, to_nick, message, chan, endts)).fetchone()[0]
 
-        reminder = Reminder(reminderid, to_nick, nick, message, chan, datetime.utcnow(), endts)
+        add_reminder(bot, reminderid, to_nick, nick, message, chan, utcnow, endts)
 
-        timer = threading.Timer(delta.total_seconds(), remind_handler, args=(bot, reminder))
-        timer.start()
-        timers.append(timer)
-
-        reminders[to_nick].append(reminder)
-        bot.msg(chan, f"I'll remind {pronoun} in {delta}.")
+        bot.msg(chan, f"I'll remind {pronoun} in {delta}. To cancel, send .rmcancel {reminderid}.")
     else:
         # this is a tell
         tellid = db.execute("INSERT INTO tells (to_nick, from_nick, message) VALUES (%s,%s,%s) RETURNING tellid;",
@@ -150,7 +147,69 @@ def remind(bot, nick, chan, gr, arg):
 
         tells[to_nick].append(Tell(tellid, nick, message, datetime.utcnow()))
 
-        bot.msg(chan, f"I'll tell {pronoun} that.")
+        bot.msg(chan, f"I'll tell {pronoun} that. To cancel, send .tcancel {tellid}.")
+
+@command('rmcancel', cmdchar='.')
+def cancel_reminder(bot, nick, chan, arg):
+    """ .rmcancel <id> - Cancels your started reminder, if possible. """
+    try:
+        rid = int(arg)
+    except ValueError:
+        raise CommandException(f"reminder id missing or invalid.", send_doc=True)
+
+    row = db.execute("SELECT from_nick, to_nick, message, endts FROM reminders WHERE id = %s;",
+                     (rid,)).fetchone()
+
+    if not row:
+        raise CommandException("that reminder does not exist.")
+
+    from_nick, to_nick, message, endts = row
+
+    if endts <= datetime.utcnow():
+        raise CommandException("that reminder has already fired.")
+
+    if from_nick != nick:
+        raise CommandException("you did not create that reminder!")
+
+    db.execute("DELETE FROM reminders WHERE id = %s;", (rid,))
+    for timer in timers:
+        if timer.reminder.id == rid:
+            timer.cancel()
+            break
+
+    bot.msg(chan, "Reminder cancelled successfully.")
+
+@command('tcancel', cmdchar='.')
+def cancel_tell(bot, nick, chan, arg):
+    """ .tcancel <id> - Cancels your tell, if possible. """
+    try:
+        tid = int(arg)
+    except ValueError:
+        raise CommandException(f"tell id missing or invalid.", send_doc=True)
+
+    row = db.execute("SELECT to_nick, from_nick, message, begints, fulfilled FROM tells WHERE tellid = %s;",
+                     (tid,)).fetchone()
+
+    if not row:
+        raise CommandException("that tell does not exist.")
+
+    to_nick, from_nick, message, begints, fulfilled = row
+
+    if fulfilled:
+        raise CommandException("that tell has already been sent.")
+
+    if from_nick != nick:
+        raise CommandException("you did not create that tell!")
+
+    db.execute("DELETE FROM tells WHERE tellid = %s;", (tid,))
+    for tell in tells[to_nick]:
+        if tell.id == tid:
+            to_remove = tell
+            break
+
+    tells[to_nick].remove(to_remove)
+    bot.msg(chan, "Tell cancelled successfully.")
+
 
 @init
 def init(bot):

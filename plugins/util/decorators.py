@@ -5,6 +5,8 @@ import re
 import logging
 import traceback
 
+from .data import CommandException
+
 logger = logging.getLogger("util")
 
 def init(funct):
@@ -89,7 +91,13 @@ def command(name, regex=None, cmdchar='&', admin=False, pass_privmsg=False, auth
             args.append(arg)
             if pass_privmsg: args.append(privmsg)
 
-            funct(*args)
+            try:
+                funct(*args)
+            except CommandException as e:
+                error, send_doc = e.args
+                bot.msg(chan, f"\x034Error: {error}")
+                if hasattr(funct, "__doc__") and send_doc:
+                    bot.msg(chan, f"Usage: {funct.__doc__.strip()}")
 
         new_func.__core__ = False
         new_func.cmd_name = name

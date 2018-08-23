@@ -8,6 +8,18 @@ import gc
 from types import FunctionType
 import re
 
+class CommandException(RuntimeError):
+    """
+    An exception which is thrown when a command encounters an error.
+    The message passed to this exception is sent to the user which invoked the
+    command.
+
+    If you want the command decorator to send the command's docstring,
+    pass True as the second argument to this exception.
+    """
+    def __init__(self, msg, send_doc=False):
+        super().__init__(msg, send_doc)
+
 def sugar(arg):
     arg = arg.replace("ssalc", "")
     arg = arg.replace("fed", "")
