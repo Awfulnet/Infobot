@@ -9,12 +9,14 @@ import regex
 import threading
 import logging
 
-from pytz import timezone
+from pytz import utc
 from .util.decorators import command, init, process_privmsg
 from .util.dict import CaseInsensitiveDefaultDict as CIDD
 from .util.data import CommandException
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from dateparser.search import search_dates
 
 logger = logging.getLogger("remind")
 logger.setLevel(logging.DEBUG)
@@ -22,6 +24,8 @@ logger.setLevel(logging.DEBUG)
 db = None
 Tell = namedtuple("Tell", ["id", "from_nick", "message", "date"])
 Reminder = namedtuple("Reminder", ["id", "to_nick", "from_nick", "message", "channel", "begints", "endts"])
+
+dp_settings = {"RETURN_AS_TIMEZONE_AWARE": True, "TIMEZONE": "UTC"}
 
 calendar = parsedatetime.Calendar()
 
@@ -34,17 +38,7 @@ REMIND_RE = "\.remind (me|@?[A-z0-9]+) (?:in (.+?) to (.+)$|(?:to )?(.+?) in (.+
 REMIND_TELL_RE = regex.compile(r"""^
     \.(?:tell|remind)\s
         (?P<nick> me|@? [A-z0-9]+)\s
-        (?:
-            (?:in\s(?P<time> .+?))\s(?:to \s (?P<message>.+)$)
-            |
-            (?:
-                (?:to \s )?
-                    (?:(?P<message>.+)\sin\s(?P<time>.+)
-                    |
-                    (?P<message>.+)
-                )
-            )
-        )""",
+        (?P<message_with_time>.+)$""",
         regex.X | regex.V1)
 
 def add_tell(to_nick, tellid, from_nick, message, begints):
@@ -53,12 +47,12 @@ def add_tell(to_nick, tellid, from_nick, message, begints):
 
 def add_reminder(bot, *args):
     reminder = Reminder(*args)
-    current_time = datetime.utcnow()
+    current_time = datetime.now(utc)
     if (current_time >= reminder.endts):
         remind_handler(bot, reminder)
         return
 
-    delta = reminder.endts - datetime.utcnow()
+    delta = reminder.endts - current_time
     timer = threading.Timer(delta.total_seconds(), remind_handler, args=(bot, reminder))
     timer.reminder = reminder
     timer.start()
@@ -77,7 +71,7 @@ def db_get_reminders(bot):
         add_reminder(bot, *reminder)
 
 def send_tell(bot, nick, chan, tell):
-    timestring = humanize.naturaltime(datetime.utcnow() - tell.date)
+    timestring = humanize.naturaltime(datetime.now(utc) - tell.date)
 
     output = "{} {}: {} · {} · {}".format( # message indicator, to_nick, message, from, time
         bot.style.green("| ✉ |"),
@@ -96,8 +90,11 @@ def tell_handler(bot, nick, chan):
             send_tell(bot, nick, chan, tell)
         del tells[nick]
 
+def round_to_seconds(td: timedelta) -> timedelta:
+    return timedelta(seconds=round(td.total_seconds()))
+
 def remind_handler(bot, reminder, late_time=None):
-    timestring = humanize.naturaltime(datetime.utcnow() - reminder.begints)
+    timestring = humanize.naturaltime(round_to_seconds(datetime.now(utc) - reminder.begints))
     output = "{} {}: {} · {} · {}".format(
         bot.style.green("| ✉ |"),
         bot.style.teal(reminder.to_nick),
@@ -115,11 +112,15 @@ __callbacks__ = {
         lambda b,m: tell_handler(b, *process_privmsg(m)[:2])
     ]}
 
+def time_select(times):
+    return times[0]
+
 @command('remind', REMIND_TELL_RE)
 def remind(bot, nick, chan, gr, arg):
     to_nick = gr['nick']
-    time = gr['time']
-    message = gr['message']
+
+    message_with_time = gr['message_with_time']
+    times = search_dates(message_with_time, languages=['en'], settings=dp_settings)
     if (to_nick == 'me'):
         to_nick = nick
 
@@ -127,11 +128,14 @@ def remind(bot, nick, chan, gr, arg):
 
     to_nick = to_nick.strip('@')
 
-    if (time is not None):
+    if (times is not None):
         # this is a reminder, as it has an end time
-        endts = calendar.parseDT(time, tzinfo=timezone("UTC"))[0]
+        cut, endts = time_select(times)
+        message = message_with_time.replace(cut, "").strip()
+
+        print(cut, endts)
         # UTCnow doesn't add a timezone attribute, so we have to add it ourselves
-        utcnow = datetime.utcnow().replace(tzinfo=timezone("UTC"))
+        utcnow = datetime.now(utc)
         delta = endts - utcnow
 
         reminderid = db.execute("INSERT INTO reminders (from_nick, to_nick, message, channel, endts) VALUES (%s,%s,%s,%s,%s) RETURNING id;",
@@ -139,13 +143,15 @@ def remind(bot, nick, chan, gr, arg):
 
         add_reminder(bot, reminderid, to_nick, nick, message, chan, utcnow, endts)
 
-        bot.msg(chan, f"I'll remind {pronoun} in {delta}. To cancel, send .rmcancel {reminderid}.")
+        delta = humanize.naturaltime(-round_to_seconds(delta))
+        bot.msg(chan, f"I'll remind {pronoun} {delta}. To cancel, send .rmcancel {reminderid}.")
     else:
         # this is a tell
+        message = message_with_time
         tellid = db.execute("INSERT INTO tells (to_nick, from_nick, message) VALUES (%s,%s,%s) RETURNING tellid;",
                 (to_nick, nick, message)).fetchone()[0];
 
-        tells[to_nick].append(Tell(tellid, nick, message, datetime.utcnow()))
+        tells[to_nick].append(Tell(tellid, nick, message, datetime.now(utc)))
 
         bot.msg(chan, f"I'll tell {pronoun} that. To cancel, send .tcancel {tellid}.")
 
@@ -165,7 +171,7 @@ def cancel_reminder(bot, nick, chan, arg):
 
     from_nick, to_nick, message, endts = row
 
-    if endts <= datetime.utcnow():
+    if endts <= datetime.now(utc):
         raise CommandException("that reminder has already fired.")
 
     if from_nick != nick:
