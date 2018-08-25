@@ -33,7 +33,6 @@ timers = []
 reminders = CIDD(default=[])
 tells = CIDD(default=[])
 
-REMIND_RE = "\.remind (me|@?[A-z0-9]+) (?:in (.+?) to (.+)$|(?:to )?(.+?) in (.+)$)"
 
 REMIND_TELL_RE = regex.compile(r"""^
     \.(?:tell|remind)\s
