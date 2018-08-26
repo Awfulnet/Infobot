@@ -3,7 +3,6 @@
 
 * depends: database
 """
-import parsedatetime
 import humanize
 import regex
 import threading
@@ -26,8 +25,6 @@ Tell = namedtuple("Tell", ["id", "from_nick", "message", "date"])
 Reminder = namedtuple("Reminder", ["id", "to_nick", "from_nick", "message", "channel", "begints", "endts"])
 
 dp_settings = {"RETURN_AS_TIMEZONE_AWARE": True, "TIMEZONE": "UTC"}
-
-calendar = parsedatetime.Calendar()
 
 timers = []
 reminders = CIDD(default=[])

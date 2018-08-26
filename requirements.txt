@@ -1,6 +1,5 @@
 psycopg2-binary
 pyflakes
-parsedatetime
 pytz
 regex
 coloredlogs
