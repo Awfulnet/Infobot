@@ -168,7 +168,6 @@ def remind(bot, nick, chan, gr, arg):
         logger.debug(f"To cut: {cut} End TS: {endts}")
         # UTCnow doesn't add a timezone attribute, so we have to add it ourselves
         utcnow = datetime.now(utc)
-        delta = endts - utcnow
         if endts < utcnow:
             raise CommandException("You're trying to start a reminder for a date in the past.")
 
@@ -177,8 +176,8 @@ def remind(bot, nick, chan, gr, arg):
 
         add_reminder(bot, reminderid, to_nick, nick, message, chan, utcnow, endts)
 
-        delta = humanize.naturaltime(-round_to_seconds(delta))
-        bot.msg(chan, f"I'll remind {pronoun} {delta}. To cancel, send .rmcancel {reminderid}.")
+        delta = round_to_seconds(endts - utcnow)
+        bot.msg(chan, f"I'll remind {pronoun} in {delta}. To cancel, send .rmcancel {reminderid}.")
     else:
         # this is a tell
         message = message_with_time
