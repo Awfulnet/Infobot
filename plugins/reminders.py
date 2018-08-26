@@ -165,7 +165,7 @@ def remind(bot, nick, chan, gr, arg):
         cut, endts = time_select(times)
         message = message_with_time.replace(cut, "").strip()
 
-        print(cut, endts)
+        logger.debug(f"To cut: {cut} End TS: {endts}")
         # UTCnow doesn't add a timezone attribute, so we have to add it ourselves
         utcnow = datetime.now(utc)
         delta = endts - utcnow
