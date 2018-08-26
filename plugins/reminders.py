@@ -169,6 +169,8 @@ def remind(bot, nick, chan, gr, arg):
         # UTCnow doesn't add a timezone attribute, so we have to add it ourselves
         utcnow = datetime.now(utc)
         delta = endts - utcnow
+        if endts < utcnow:
+            raise CommandException("You're trying to start a reminder for a date in the past.")
 
         reminderid = db.execute("INSERT INTO reminders (from_nick, to_nick, message, channel, endts) VALUES (%s,%s,%s,%s,%s) RETURNING id;",
                                 (nick, to_nick, message, chan, endts)).fetchone()[0]
