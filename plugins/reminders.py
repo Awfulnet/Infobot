@@ -33,6 +33,20 @@ timers = []
 reminders = CIDD(default=[])
 tells = CIDD(default=[])
 
+def get_seconds_for_timespan(timespan: str):
+    if timespan in ('week', 'wk', 'w'):
+        return 604800
+    if timespan in ('day', 'd'):
+        return 86400
+    if timespan in ('hour', 'hr', 'h'):
+        return 3600
+    if timespan in ('minute', 'min', 'm'):
+        return 60
+    return 1
+
+TIMESPANS = r"(?:(?P<number>\d+) ?(?P<span>week|wk|w|day|d|hour|hr|h|minute|min|m|second|sec|s)s?)"
+SIMPLE_SPAN_RE = regex.compile(r"in {}( ?\+? ?{})*".format(TIMESPANS,
+                                                           TIMESPANS), regex.V1)
 
 REMIND_TELL_RE = regex.compile(r"""^
     \.(?:tell|remind)\s
@@ -114,14 +128,33 @@ __callbacks__ = {
 def time_select(times):
     return times[0]
 
+def get_simple_ts(msg):
+    m = SIMPLE_SPAN_RE.search(msg)
+    logger.debug(f"Found timestamp match: {m}")
+
+    if not m: return None
+
+    date_parts = [*zip(m.captures('number'), m.captures('span'))]
+    length = 0
+    for num, span in date_parts:
+        length += get_seconds_for_timespan(span) * int(num)
+
+    t = timedelta(seconds=length)
+    logger.debug(f"timedelta: {t}")
+
+    return ((m.group(0), datetime.now(utc) + t),)
+
 @command('remind', REMIND_TELL_RE)
 def remind(bot, nick, chan, gr, arg):
     to_nick = gr['nick']
 
     message_with_time = gr['message_with_time']
-    times = search_dates(message_with_time, languages=['en'], settings=dp_settings)
+    times = get_simple_ts(message_with_time)
     if (to_nick == 'me'):
         to_nick = nick
+
+    if not times:
+        times = search_dates(message_with_time, languages=['en'], settings=dp_settings)
 
     pronoun = 'them' if to_nick != nick else "you"
 
