@@ -157,7 +157,7 @@ def remind(bot, nick, chan, gr, arg):
 
     to_nick = to_nick.strip('@')
 
-    if (times is not None):
+    if times:
         # this is a reminder, as it has an end time
         cut, endts = time_select(times)
         message = message_with_time.replace(cut, "").strip()
