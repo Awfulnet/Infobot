@@ -22,7 +22,7 @@ def parse(msg):
             args = parts[2].split()
 
         info = {"method": parts[1], "host": parts[0][1:], "arg":
-                parts[2], "args": args}
+                parts[2], "args": args, "raw": msg}
 
     return info
 

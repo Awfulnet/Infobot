@@ -8,6 +8,13 @@ import sys
 from collections import defaultdict
 from functools import reduce
 
+def coroutine(fn):
+    def wrapper(*args, **kwargs):
+        cr = fn(*args, **kwargs)
+        ret = cr.send(None)
+        return (ret, cr)
+    return wrapper
+
 def exc_line(exception):
     return f"\x02\x034{type(exception).__name__}: {exception}\x03\x02"
 

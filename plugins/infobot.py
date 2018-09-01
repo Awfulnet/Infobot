@@ -1,10 +1,12 @@
 """
 Info functionality
 
-* depends: database, auth_ng
+* depends: database, auth_ng, wait_for
 """
+from .util import coroutine
 from .util.decorators import command, init, process_privmsg
 from .sed import Substitution
+from .wait_for import wait_for_auth
 from .util.data import get_doc
 from functools import partial
 import re
@@ -21,19 +23,31 @@ def caller():
 
 def addinfo(bot, pmsg):
     nick, chan, msg = process_privmsg(pmsg)
+    ret, cr = addinfo_inner(bot, nick, chan, msg, pmsg)
+    if ret:
+        wait_for_auth(bot, nick, lambda authed: (next(cr), cr.send(authed)))
 
+@coroutine
+def addinfo_inner(bot, nick, chan, msg, pmsg):
     m = re.search(r"^!add .+", msg)
     if not m:
-        return
+        yield False
 
     if ' ' not in msg:
-        return bot.msg(chan, "Usage: !add <info>")
+        bot.msg(chan, "Usage: !add <info>")
+        yield False
+
     user, host = pmsg['host'].split("@")
     user = user.split("!")[1]
 
     info = msg.split(" ", 1)[1]
-    if not bot.auth.is_authed(nick):
-        return bot.notice(nick, "You are not registered with NickServ or not properly identified.")
+
+    yield True
+    is_authed = (yield)
+
+    if not is_authed:
+        bot.notice(nick, "You are not registered with NickServ or not properly identified.")
+        yield
 
     if 'alias' in info:
         alias = msg.split()[2]
@@ -49,6 +63,8 @@ def addinfo(bot, pmsg):
     else:
         db.execute("SELECT addinfo(%s, %s, %s, %s);", (nick, user, host, info))
         bot.notice(nick, "Info set to '%s'" % (info))
+
+    yield
 
 __callbacks__ = {"PRIVMSG": [addinfo]}
 
