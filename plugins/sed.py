@@ -49,7 +49,6 @@ class Substitution(object):
     def __init__(self, pattern):
         self.pattern = pattern
         self.qual, self.re, self.sub, self.flags, self.count = self.parse(pattern)
-        print("s/%s/%s/%s" % (self.re, self.sub, self.flags))
 
     def __repr__(self):
         return "Substitution(%r)" % (self.pattern)
