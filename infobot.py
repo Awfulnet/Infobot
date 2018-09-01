@@ -149,6 +149,20 @@ class Infobot(IRCHandler):
     def notice_listener(self, msg):
         logger.info("*%s* %s", msg["host"], msg["arg"].split(" ", 1)[1][1:])
 
+
+    @property
+    def debug(self):
+        return logging.getLogger().getEffectiveLevel() == logging.DEBUG
+
+    @debug.setter
+    def debug(self, val):
+        if val:
+            [h.setLevel(logging.DEBUG) for h in logging.getLogger().handlers]
+            logging.getLogger().setLevel(logging.DEBUG)
+        else:
+            [h.setLevel(logging.INFO) for h in logging.getLogger().handlers]
+            logging.getLogger().setLevel(logging.INFO)
+
     def register_logger(self):
         fh = logging.FileHandler('infobot.log')
         fh.setLevel(LOGLEVEL)
